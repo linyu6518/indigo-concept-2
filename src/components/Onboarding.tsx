@@ -854,9 +854,11 @@ export function Onboarding() {
                 >
                   {feedData.healthScore}
                 </button>
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <span>Health</span>
-                  <Info className="w-3 h-3" />
+                  <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-current/30 bg-muted/50">
+                    <Info className="w-3 h-3" />
+                  </span>
                 </div>
                 
                 {/* Tooltip */}
@@ -1130,21 +1132,24 @@ export function Onboarding() {
                             </div>
                           </td>
 
-                          {/* Health Score */}
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          {/* Health Score - circle with fixed size via inline style so table cannot squash */}
+                          <td className="px-6 py-4 whitespace-nowrap align-middle">
                             {feed.healthScore !== undefined && (
-                              <div className="flex items-center gap-2">
-                                <div className="w-9 h-9 rounded-full border flex items-center justify-center"
-                                  style={{
-                                    borderColor: feed.healthScore >= 80 ? '#5BBD72' : feed.healthScore >= 60 ? '#f59e0b' : '#ef4444'
-                                  }}
-                                >
-                                  <span className="text-xs font-bold" style={{
-                                    color: feed.healthScore >= 80 ? '#5BBD72' : feed.healthScore >= 60 ? '#f59e0b' : '#ef4444'
-                                  }}>
-                                    {feed.healthScore}
-                                  </span>
-                                </div>
+                              <div
+                                className="inline-flex items-center justify-center rounded-full border box-border shrink-0"
+                                style={{
+                                  width: 36,
+                                  height: 36,
+                                  minWidth: 36,
+                                  minHeight: 36,
+                                  borderColor: feed.healthScore >= 80 ? '#5BBD72' : feed.healthScore >= 60 ? '#f59e0b' : '#ef4444'
+                                }}
+                              >
+                                <span className="text-xs font-bold leading-none" style={{
+                                  color: feed.healthScore >= 80 ? '#5BBD72' : feed.healthScore >= 60 ? '#f59e0b' : '#ef4444'
+                                }}>
+                                  {feed.healthScore}
+                                </span>
                               </div>
                             )}
                           </td>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { 
@@ -37,6 +37,51 @@ interface DAGViewProps {
 export function DAGView({ nodes, onNodeClick, onEditNode }: DAGViewProps) {
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
+
+  // Node drag: user can drag nodes to reposition
+  const [nodePositions, setNodePositions] = useState<Record<string, { x: number; y: number }>>({});
+  const [draggingNodeId, setDraggingNodeId] = useState<string | null>(null);
+  const nodeDragRef = useRef<{
+    nodeId: string;
+    startClientX: number;
+    startClientY: number;
+    startNodeX: number;
+    startNodeY: number;
+  } | null>(null);
+  const nodeDragMovedRef = useRef(false);
+
+  const handlePanStart = useCallback((e: React.MouseEvent) => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    setIsDragging(true);
+    dragStartRef.current = { x: e.clientX, y: e.clientY, panX: pan.x, panY: pan.y };
+  }, [pan.x, pan.y]);
+
+  const handlePanMove = useCallback((e: MouseEvent) => {
+    const start = dragStartRef.current;
+    setPan({
+      x: start.panX + (e.clientX - start.x),
+      y: start.panY + (e.clientY - start.y),
+    });
+  }, []);
+
+  const handlePanEnd = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  useEffect(() => {
+    if (!isDragging) return;
+    window.addEventListener("mousemove", handlePanMove);
+    window.addEventListener("mouseup", handlePanEnd);
+    return () => {
+      window.removeEventListener("mousemove", handlePanMove);
+      window.removeEventListener("mouseup", handlePanEnd);
+    };
+  }, [isDragging, handlePanMove, handlePanEnd]);
+
   // Calculate DAG layout positions (Hierarchical Layout)
   const getNodePosition = (index: number, total: number) => {
     // For sequential flow, use a left-to-right hierarchical layout
@@ -90,11 +135,73 @@ export function DAGView({ nodes, onNodeClick, onEditNode }: DAGViewProps) {
   const connections = getConnections();
   const containerHeight = Math.ceil(sortedNodes.length / Math.ceil(Math.sqrt(sortedNodes.length))) * 400 + 100;
 
+  const getEffectiveNodePosition = useCallback(
+    (index: number, total: number) => {
+      const node = sortedNodes[index];
+      if (!node) return getNodePosition(index, total);
+      const override = nodePositions[node.id];
+      return override ?? getNodePosition(index, total);
+    },
+    [sortedNodes, nodePositions]
+  );
+
+  const handleNodeDragStart = useCallback(
+    (e: React.MouseEvent, nodeId: string, index: number) => {
+      if (e.button !== 0) return;
+      e.stopPropagation();
+      const pos = getEffectiveNodePosition(index, sortedNodes.length);
+      nodeDragRef.current = {
+        nodeId,
+        startClientX: e.clientX,
+        startClientY: e.clientY,
+        startNodeX: pos.x,
+        startNodeY: pos.y,
+      };
+      nodeDragMovedRef.current = false;
+      setDraggingNodeId(nodeId);
+    },
+    [getEffectiveNodePosition, sortedNodes.length]
+  );
+
+  const handleNodeDragMove = useCallback((e: MouseEvent) => {
+    const ref = nodeDragRef.current;
+    if (!ref) return;
+    nodeDragMovedRef.current = true;
+    setNodePositions((prev) => ({
+      ...prev,
+      [ref.nodeId]: {
+        x: ref.startNodeX + (e.clientX - ref.startClientX) / zoom,
+        y: ref.startNodeY + (e.clientY - ref.startClientY) / zoom,
+      },
+    }));
+  }, [zoom]);
+
+  const handleNodeDragEnd = useCallback(() => {
+    nodeDragRef.current = null;
+    setDraggingNodeId(null);
+  }, []);
+
+  useEffect(() => {
+    if (!draggingNodeId) return;
+    window.addEventListener("mousemove", handleNodeDragMove);
+    window.addEventListener("mouseup", handleNodeDragEnd);
+    return () => {
+      window.removeEventListener("mousemove", handleNodeDragMove);
+      window.removeEventListener("mouseup", handleNodeDragEnd);
+    };
+  }, [draggingNodeId, handleNodeDragMove, handleNodeDragEnd]);
+
   return (
-    <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-6 overflow-auto" style={{ minHeight: '600px' }}>
-      {/* Grid Background Pattern */}
-      <div 
-        className="absolute inset-0 pointer-events-none opacity-30"
+    <div
+      className={`relative w-full bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-6 overflow-auto ${isDragging ? "cursor-grabbing" : ""}`}
+      style={{
+        height: 'calc(100vh - 12rem)',
+        minHeight: '400px',
+      }}
+    >
+      {/* Grid Background Pattern - fills container, adapts to browser */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-30 rounded-lg"
         style={{
           backgroundImage: 'radial-gradient(circle, #5BBD72 1px, transparent 1px)',
           backgroundSize: '30px 30px',
@@ -129,15 +236,23 @@ export function DAGView({ nodes, onNodeClick, onEditNode }: DAGViewProps) {
         </button>
       </div>
 
-      <div 
+      <div
         className="relative transition-transform duration-300"
-        style={{ 
-          transform: `scale(${zoom})`,
-          transformOrigin: 'top left',
+        style={{
+          transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+          transformOrigin: "0 0",
         }}
       >
-      <svg 
-        className="absolute top-0 left-0 w-full h-full pointer-events-none" 
+        {/* Pan layer: drag on empty area to move canvas */}
+        <div
+          className="absolute left-0 top-0 z-0 cursor-grab active:cursor-grabbing"
+          style={{ width: "100%", height: containerHeight }}
+          onMouseDown={handlePanStart}
+          role="presentation"
+          aria-hidden
+        />
+      <svg
+        className="absolute top-0 left-0 z-[1] w-full h-full pointer-events-none"
         style={{ height: `${containerHeight}px` }}
       >
         <defs>
@@ -153,10 +268,10 @@ export function DAGView({ nodes, onNodeClick, onEditNode }: DAGViewProps) {
           </marker>
         </defs>
         
-        {/* Draw connections */}
+        {/* Draw connections - use effective positions so lines follow dragged nodes */}
         {connections.map((conn, idx) => {
-          const fromPos = getNodePosition(conn.from, sortedNodes.length);
-          const toPos = getNodePosition(conn.to, sortedNodes.length);
+          const fromPos = getEffectiveNodePosition(conn.from, sortedNodes.length);
+          const toPos = getEffectiveNodePosition(conn.to, sortedNodes.length);
           
           // Calculate connection points (from right edge of source to left edge of target)
           const x1 = fromPos.x + 280; // Right edge of card
@@ -219,16 +334,18 @@ export function DAGView({ nodes, onNodeClick, onEditNode }: DAGViewProps) {
         })}
       </svg>
 
-      {/* Render nodes */}
-      <div className="relative" style={{ height: `${containerHeight}px` }}>
+      {/* Render nodes - draggable */}
+      <div className="relative z-10" style={{ height: `${containerHeight}px` }}>
         {sortedNodes.map((rg, index) => {
-          const pos = getNodePosition(index, sortedNodes.length);
+          const pos = getEffectiveNodePosition(index, sortedNodes.length);
           
           return (
             <Card
               key={rg.id}
-              className={`absolute bg-white border-2 hover:shadow-xl transition-all cursor-pointer ${
-                hoveredNode === rg.id 
+              className={`absolute bg-white border-2 hover:shadow-xl transition-all ${
+                draggingNodeId === rg.id ? 'cursor-grabbing shadow-2xl z-20' : 'cursor-grab'
+              } ${
+                hoveredNode === rg.id && !draggingNodeId
                   ? 'border-primary shadow-2xl scale-105 z-10' 
                   : rg.highRiskRules && rg.highRiskRules > 0
                   ? 'border-amber-300/50'
@@ -238,11 +355,15 @@ export function DAGView({ nodes, onNodeClick, onEditNode }: DAGViewProps) {
                 left: `${pos.x}px`,
                 top: `${pos.y}px`,
                 width: '280px',
-                transform: hoveredNode === rg.id ? 'translateZ(0) scale(1.05)' : 'translateZ(0)',
-                transition: 'all 0.3s ease',
+                transform: hoveredNode === rg.id && !draggingNodeId ? 'translateZ(0) scale(1.05)' : 'translateZ(0)',
+                transition: draggingNodeId === rg.id ? 'none' : 'all 0.3s ease',
               }}
-              onClick={() => onNodeClick(rg)}
-              onMouseEnter={() => setHoveredNode(rg.id)}
+              onMouseDown={(e) => handleNodeDragStart(e, rg.id, index)}
+              onClick={() => {
+                if (nodeDragMovedRef.current) return;
+                onNodeClick(rg);
+              }}
+              onMouseEnter={() => !draggingNodeId && setHoveredNode(rg.id)}
               onMouseLeave={() => setHoveredNode(null)}
             >
               <div className="p-5">
