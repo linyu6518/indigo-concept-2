@@ -401,6 +401,76 @@ const recentlyVisited: FeedData[] = [
     releaseStatus: "deployed",
     healthScore: 72
   },
+  {
+    feed: "EUCashEquity",
+    ruleGroups: 5,
+    rules: 44,
+    lastUpdated: "3 days ago",
+    status: "active",
+    pendingChanges: 0,
+    highRiskRules: 0,
+    lastModified: "3 days ago",
+    impactedReports: 18,
+    dqFailures: 0,
+    releaseStatus: "deployed",
+    healthScore: 91
+  },
+  {
+    feed: "APACLoansMortgage",
+    ruleGroups: 4,
+    rules: 28,
+    lastUpdated: "4 days ago",
+    status: "active",
+    pendingChanges: 2,
+    highRiskRules: 1,
+    lastModified: "5 days ago",
+    impactedReports: 6,
+    dqFailures: 0,
+    releaseStatus: "staged",
+    healthScore: 78
+  },
+  {
+    feed: "GlobalFXSpot",
+    ruleGroups: 8,
+    rules: 52,
+    lastUpdated: "1 week ago",
+    status: "active",
+    pendingChanges: 1,
+    highRiskRules: 2,
+    lastModified: "1 week ago",
+    impactedReports: 14,
+    dqFailures: 1,
+    releaseStatus: "deployed",
+    healthScore: 68
+  },
+  {
+    feed: "USWealthAdvisory",
+    ruleGroups: 3,
+    rules: 39,
+    lastUpdated: "1 week ago",
+    status: "active",
+    pendingChanges: 4,
+    highRiskRules: 0,
+    lastModified: "1 week ago",
+    impactedReports: 11,
+    dqFailures: 0,
+    releaseStatus: "development",
+    healthScore: 88
+  },
+  {
+    feed: "UKRegulatoryReporting",
+    ruleGroups: 7,
+    rules: 67,
+    lastUpdated: "2 weeks ago",
+    status: "active",
+    pendingChanges: 2,
+    highRiskRules: 3,
+    lastModified: "2 weeks ago",
+    impactedReports: 22,
+    dqFailures: 2,
+    releaseStatus: "deployed",
+    healthScore: 65
+  },
 ];
 
 interface HistoryChange {
@@ -971,11 +1041,22 @@ export function Onboarding() {
             </div>
           </div>
 
-          {/* Recently Visited */}
-          <div>
-            <h2 className="text-sm font-semibold text-foreground mb-3">Recently Visited</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {recentlyVisited.map((feed) => renderFeedHealthCard(feed))}
+          {/* Recently visited - horizontal scroll: ~4.5 cards visible; width from section container (100cqw) */}
+          <div className="w-full min-w-0" style={{ containerType: "inline-size" }}>
+            <h2 className="text-sm font-medium text-muted-foreground mb-4 flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              Recently visited
+            </h2>
+            <div className="flex gap-4 overflow-x-auto pb-2 -mx-1 w-full">
+              {recentlyVisited.map((feed) => (
+                <div
+                  key={feed.feed}
+                  className="flex-shrink-0 min-w-[200px]"
+                  style={{ width: "calc((100cqw - 4 * 1rem) / 4.5)" }}
+                >
+                  {renderFeedHealthCard(feed)}
+                </div>
+              ))}
             </div>
           </div>
 

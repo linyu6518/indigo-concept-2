@@ -145,6 +145,36 @@ const mockReferenceTables: ReferenceTableData[] = [
     riskLevel: "High",
     lastModified: "5 days ago"
   },
+  {
+    id: "7",
+    name: "CounterpartyMapping",
+    columns: 5,
+    rows: 210,
+    usedIn: { onboardingRules: 4, dqRules: 2, reports: 5 },
+    pendingChanges: 2,
+    riskLevel: "Medium",
+    lastModified: "1 day ago"
+  },
+  {
+    id: "8",
+    name: "CurrencyConversionRates",
+    columns: 4,
+    rows: 180,
+    usedIn: { onboardingRules: 8, dqRules: 1, reports: 4 },
+    pendingChanges: 0,
+    riskLevel: "Low",
+    lastModified: "3 hours ago"
+  },
+  {
+    id: "9",
+    name: "RegulatoryJurisdictionCodes",
+    columns: 6,
+    rows: 95,
+    usedIn: { onboardingRules: 2, dqRules: 3, reports: 6 },
+    pendingChanges: 1,
+    riskLevel: "High",
+    lastModified: "4 days ago"
+  },
 ];
 
 const mockTableData: TableRow[] = [
@@ -190,7 +220,7 @@ export function ReferenceTable() {
   const [validationIssues, setValidationIssues] = useState<ValidationIssue[]>([]);
   const [showImpactSimulation, setShowImpactSimulation] = useState(false);
 
-  const recentlyVisited = mockReferenceTables.slice(0, 3);
+  const recentlyVisited = mockReferenceTables.slice(0, 9);
   const allTables = mockReferenceTables;
 
   const handleTableClick = (tableId: string) => {
@@ -331,18 +361,19 @@ export function ReferenceTable() {
           </div>
         </div>
 
-        {/* Recently visited section */}
-        <div className="mb-8">
+        {/* Recently visited - horizontal scroll, ~3.5 cards visible, width adaptive */}
+        <div className="mb-8 w-full min-w-0" style={{ containerType: "inline-size" }}>
           <h2 className="text-sm font-medium text-muted-foreground mb-4 flex items-center gap-2">
             <Clock className="w-4 h-4" />
             Recently visited
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="flex gap-4 overflow-x-auto pb-2 -mx-1 w-full">
             {recentlyVisited.map((table) => (
               <button
                 key={table.id}
                 onClick={() => handleTableClick(table.id)}
-                className="bg-white border border-gray-200 rounded-lg p-5 text-left hover:border-[#5BBD72] hover:shadow-md transition-all"
+                className="flex-shrink-0 min-w-[200px] bg-white border border-gray-200 rounded-lg p-5 text-left hover:border-[#5BBD72] hover:shadow-md transition-all"
+                style={{ width: "calc((100cqw - 3 * 1rem) / 3.5)" }}
               >
                 <div className="flex items-start justify-between mb-3">
                   <h3 className="font-semibold text-foreground">{table.name}</h3>
