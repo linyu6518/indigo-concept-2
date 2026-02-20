@@ -82,36 +82,16 @@ export function DAGView({ nodes, onNodeClick, onEditNode }: DAGViewProps) {
     };
   }, [isDragging, handlePanMove, handlePanEnd]);
 
-  // Calculate DAG layout positions (Hierarchical Layout)
-  const getNodePosition = (index: number, total: number) => {
-    // For sequential flow, use a left-to-right hierarchical layout
-    // Create a more natural DAG flow pattern
-    if (total <= 2) {
-      // Linear layout for 1-2 nodes
-      return {
-        x: index * 350 + 100,
-        y: 100,
-      };
-    } else if (total <= 4) {
-      // 2x2 grid for 3-4 nodes
-      const row = Math.floor(index / 2);
-      const col = index % 2;
-      return {
-        x: col * 380 + 100,
-        y: row * 420 + 100,
-      };
-    } else {
-      // Staggered pattern for better visualization
-      const nodesPerRow = Math.min(3, total);
-      const row = Math.floor(index / nodesPerRow);
-      const col = index % nodesPerRow;
-      // Add stagger for alternating rows
-      const staggerOffset = row % 2 === 1 ? 190 : 0;
-      return {
-        x: col * 380 + 100 + staggerOffset,
-        y: row * 420 + 100,
-      };
-    }
+  // Default: horizontal layout (single row, left to right)
+  const CARD_WIDTH = 280;
+  const NODE_GAP = 80;
+  const MARGIN = 100;
+
+  const getNodePosition = (index: number, _total: number) => {
+    return {
+      x: index * (CARD_WIDTH + NODE_GAP) + MARGIN,
+      y: MARGIN,
+    };
   };
 
   // Generate connections between sequential nodes
@@ -133,7 +113,7 @@ export function DAGView({ nodes, onNodeClick, onEditNode }: DAGViewProps) {
 
   const sortedNodes = [...nodes].sort((a, b) => a.sequence - b.sequence);
   const connections = getConnections();
-  const containerHeight = Math.ceil(sortedNodes.length / Math.ceil(Math.sqrt(sortedNodes.length))) * 400 + 100;
+  const containerHeight = 500;
 
   const getEffectiveNodePosition = useCallback(
     (index: number, total: number) => {
@@ -208,10 +188,13 @@ export function DAGView({ nodes, onNodeClick, onEditNode }: DAGViewProps) {
         }}
       />
 
-      {/* Zoom Controls */}
-      <div className="absolute top-6 right-6 bg-white border border-gray-200 rounded-lg shadow-md p-2 flex flex-col gap-2 z-20">
+      {/* Zoom Controls - fixed at viewport bottom-right via inline style so ancestor transform doesn't override */}
+      <div
+        className="fixed bg-white border border-gray-200 rounded-lg shadow-md p-2 flex flex-col gap-2"
+        style={{ right: 24, bottom: 24, zIndex: 9999 }}
+      >
         <button
-          onClick={() => setZoom(Math.min(zoom + 0.1, 1.5))}
+          onClick={() => setZoom((z) => Math.min(z + 0.1, 1.5))}
           className="px-3 py-1.5 text-sm font-semibold text-foreground hover:bg-gray-100 rounded transition-colors"
           title="Zoom In"
         >
@@ -221,7 +204,7 @@ export function DAGView({ nodes, onNodeClick, onEditNode }: DAGViewProps) {
           {Math.round(zoom * 100)}%
         </div>
         <button
-          onClick={() => setZoom(Math.max(zoom - 0.1, 0.5))}
+          onClick={() => setZoom((z) => Math.max(z - 0.1, 0.5))}
           className="px-3 py-1.5 text-sm font-semibold text-foreground hover:bg-gray-100 rounded transition-colors"
           title="Zoom Out"
         >
