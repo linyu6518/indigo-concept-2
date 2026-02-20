@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
+import { DAGView } from "./DAGView";
 import { 
   Search, 
   List, 
@@ -20,7 +21,18 @@ import {
   X,
   Bookmark,
   RefreshCw,
-  History
+  History,
+  AlertTriangle,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  TrendingUp,
+  FileWarning,
+  FolderKanban,
+  Lightbulb,
+  Info,
+  Target,
+  Shield
 } from "lucide-react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -32,6 +44,14 @@ interface FeedData {
   rules: number;
   lastUpdated?: string;
   status?: "active" | "pending" | "inactive";
+  // Phase 1: Feed Health Metrics
+  pendingChanges?: number;
+  highRiskRules?: number;
+  lastModified?: string;
+  impactedReports?: number;
+  dqFailures?: number;
+  releaseStatus?: "deployed" | "staged" | "development";
+  healthScore?: number; // 0-100
 }
 
 interface RuleGroupData {
@@ -42,6 +62,12 @@ interface RuleGroupData {
   rules: number;
   outputViewFlag: boolean;
   outputViewName?: string;
+  // Flow View Enhancements
+  highRiskRules?: number;
+  lastModified?: string;
+  impactedReports?: number;
+  blockRiskScore?: number;
+  ruleDensity?: number;
 }
 
 interface SequenceRule {
@@ -52,31 +78,222 @@ interface SequenceRule {
   value: string;
   description?: string;
   outputfile: boolean;
+  // Phase 3: Smart Governance Features
+  riskScore?: number;  // 0-100
+  impactedFields?: string[];
+  impactedReports?: number;
+  lastModified?: string;
+  modifiedBy?: string;
+  hasChanges?: boolean;
+  testStatus?: "passing" | "failing" | "untested";
 }
 
 const feedsData: FeedData[] = [
-  { feed: "Deriv_FXFWD", ruleGroups: 4, rules: 15, status: "active" },
-  { feed: "Deriv_SWAP", ruleGroups: 1, rules: 3, status: "active" },
-  { feed: "Deriv_AARO_ME", ruleGroups: 2, rules: 2, status: "pending" },
-  { feed: "USInvestment_Monthly", ruleGroups: 2, rules: 5, lastUpdated: "7 months ago", status: "active" },
-  { feed: "Deriv_ALL", ruleGroups: 5, rules: 10, status: "active" },
-  { feed: "Deriv_GLBFX", ruleGroups: 1, rules: 2, status: "active" },
-  { feed: "USInvestmentPledge", ruleGroups: 2, rules: 61, lastUpdated: "1 month ago", status: "active" },
-  { feed: "USDepositsCollateralized", ruleGroups: 3, rules: 23, status: "active" },
-  { feed: "USDepositsAmeritrade", ruleGroups: 6, rules: 32, status: "active" },
-  { feed: "USLoansCustomCashflowShaw", ruleGroups: 2, rules: 14, status: "pending" },
-  { feed: "USLoansCustomCashflowLoanID", ruleGroups: 1, rules: 13, status: "active" },
-  { feed: "USCreditCardCorporate", ruleGroups: 3, rules: 60, lastUpdated: "1 month ago", status: "active" },
-  { feed: "USCreditCardNordstrom", ruleGroups: 3, rules: 74, status: "active" },
-  { feed: "USNonSystemDataForwardStartingLoans", ruleGroups: 1, rules: 2, status: "inactive" },
-  { feed: "USNonSystemDataUSFHLBUtilizedCapacity", ruleGroups: 1, rules: 2, status: "active" },
+  { 
+    feed: "Deriv_FXFWD", 
+    ruleGroups: 4, 
+    rules: 15, 
+    status: "active",
+    pendingChanges: 3,
+    highRiskRules: 1,
+    lastModified: "2 days ago",
+    impactedReports: 5,
+    dqFailures: 0,
+    releaseStatus: "deployed",
+    healthScore: 85
+  },
+  { 
+    feed: "Deriv_SWAP", 
+    ruleGroups: 1, 
+    rules: 3, 
+    status: "active",
+    pendingChanges: 0,
+    highRiskRules: 0,
+    lastModified: "1 week ago",
+    impactedReports: 2,
+    dqFailures: 0,
+    releaseStatus: "deployed",
+    healthScore: 95
+  },
+  { 
+    feed: "Deriv_AARO_ME", 
+    ruleGroups: 2, 
+    rules: 2, 
+    status: "pending",
+    pendingChanges: 5,
+    highRiskRules: 2,
+    lastModified: "1 hour ago",
+    impactedReports: 8,
+    dqFailures: 2,
+    releaseStatus: "staged",
+    healthScore: 55
+  },
+  { 
+    feed: "USInvestment_Monthly", 
+    ruleGroups: 2, 
+    rules: 5, 
+    lastUpdated: "7 months ago", 
+    status: "active",
+    pendingChanges: 1,
+    highRiskRules: 0,
+    lastModified: "3 days ago",
+    impactedReports: 3,
+    dqFailures: 0,
+    releaseStatus: "deployed",
+    healthScore: 78
+  },
+  { 
+    feed: "Deriv_ALL", 
+    ruleGroups: 5, 
+    rules: 10, 
+    status: "active",
+    pendingChanges: 0,
+    highRiskRules: 0,
+    lastModified: "1 month ago",
+    impactedReports: 4,
+    dqFailures: 0,
+    releaseStatus: "deployed",
+    healthScore: 92
+  },
+  { 
+    feed: "Deriv_GLBFX", 
+    ruleGroups: 1, 
+    rules: 2, 
+    status: "active",
+    pendingChanges: 0,
+    highRiskRules: 0,
+    lastModified: "2 weeks ago",
+    impactedReports: 1,
+    dqFailures: 0,
+    releaseStatus: "deployed",
+    healthScore: 88
+  },
+  { 
+    feed: "USInvestmentPledge", 
+    ruleGroups: 2, 
+    rules: 61, 
+    lastUpdated: "1 month ago", 
+    status: "active",
+    pendingChanges: 2,
+    highRiskRules: 1,
+    lastModified: "4 days ago",
+    impactedReports: 7,
+    dqFailures: 1,
+    releaseStatus: "deployed",
+    healthScore: 72
+  },
+  { 
+    feed: "USDepositsCollateralized", 
+    ruleGroups: 3, 
+    rules: 23, 
+    status: "active",
+    pendingChanges: 0,
+    highRiskRules: 0,
+    lastModified: "1 week ago",
+    impactedReports: 6,
+    dqFailures: 0,
+    releaseStatus: "deployed",
+    healthScore: 90
+  },
+  { 
+    feed: "USDepositsAmeritrade", 
+    ruleGroups: 6, 
+    rules: 32, 
+    status: "active",
+    pendingChanges: 1,
+    highRiskRules: 0,
+    lastModified: "5 hours ago",
+    impactedReports: 9,
+    dqFailures: 0,
+    releaseStatus: "deployed",
+    healthScore: 82
+  },
+  { 
+    feed: "USLoansCustomCashflowShaw", 
+    ruleGroups: 2, 
+    rules: 14, 
+    status: "pending",
+    pendingChanges: 7,
+    highRiskRules: 3,
+    lastModified: "30 minutes ago",
+    impactedReports: 4,
+    dqFailures: 1,
+    releaseStatus: "development",
+    healthScore: 48
+  },
+  { 
+    feed: "USLoansCustomCashflowLoanID", 
+    ruleGroups: 1, 
+    rules: 13, 
+    status: "active",
+    pendingChanges: 0,
+    highRiskRules: 0,
+    lastModified: "3 weeks ago",
+    impactedReports: 2,
+    dqFailures: 0,
+    releaseStatus: "deployed",
+    healthScore: 86
+  },
+  { 
+    feed: "USCreditCardCorporate", 
+    ruleGroups: 3, 
+    rules: 60, 
+    lastUpdated: "1 month ago", 
+    status: "active",
+    pendingChanges: 3,
+    highRiskRules: 1,
+    lastModified: "2 hours ago",
+    impactedReports: 12,
+    dqFailures: 0,
+    releaseStatus: "staged",
+    healthScore: 75
+  },
+  { 
+    feed: "USCreditCardNordstrom", 
+    ruleGroups: 3, 
+    rules: 74, 
+    status: "active",
+    pendingChanges: 0,
+    highRiskRules: 0,
+    lastModified: "5 days ago",
+    impactedReports: 8,
+    dqFailures: 0,
+    releaseStatus: "deployed",
+    healthScore: 94
+  },
+  { 
+    feed: "USNonSystemDataForwardStartingLoans", 
+    ruleGroups: 1, 
+    rules: 2, 
+    status: "inactive",
+    pendingChanges: 0,
+    highRiskRules: 0,
+    lastModified: "6 months ago",
+    impactedReports: 0,
+    dqFailures: 0,
+    releaseStatus: "deployed",
+    healthScore: 65
+  },
+  { 
+    feed: "USNonSystemDataUSFHLBUtilizedCapacity", 
+    ruleGroups: 1, 
+    rules: 2, 
+    status: "active",
+    pendingChanges: 0,
+    highRiskRules: 0,
+    lastModified: "2 weeks ago",
+    impactedReports: 3,
+    dqFailures: 0,
+    releaseStatus: "deployed",
+    healthScore: 89
+  },
 ];
 
 const mockRuleGroups: RuleGroupData[] = [
-  { id: "1", rulegroup: "InitialLoad", sequence: 10, description: "InitialLoad", rules: 1, outputViewFlag: true, outputViewName: "InitialLoad" },
-  { id: "2", rulegroup: "ScaramoucheLoad", sequence: 20, description: "", rules: 1, outputViewFlag: false },
-  { id: "3", rulegroup: "Onboarded", sequence: 40, description: "Adding Data and Fields", rules: 32, outputViewFlag: true, outputViewName: "Onboarded" },
-  { id: "4", rulegroup: "TBSMReady", sequence: 50, description: "TBSMReady OutputFields", rules: 1, outputViewFlag: false },
+  { id: "1", rulegroup: "InitialLoad", sequence: 10, description: "InitialLoad", rules: 1, outputViewFlag: true, outputViewName: "InitialLoad", highRiskRules: 0, lastModified: "5 days ago", impactedReports: 2, blockRiskScore: 15, ruleDensity: 1 },
+  { id: "2", rulegroup: "ScaramoucheLoad", sequence: 20, description: "", rules: 1, outputViewFlag: false, highRiskRules: 0, lastModified: "1 week ago", impactedReports: 1, blockRiskScore: 20, ruleDensity: 1 },
+  { id: "3", rulegroup: "Onboarded", sequence: 40, description: "Adding Data and Fields", rules: 32, outputViewFlag: true, outputViewName: "Onboarded", highRiskRules: 2, lastModified: "2 days ago", impactedReports: 5, blockRiskScore: 55, ruleDensity: 32 },
+  { id: "4", rulegroup: "TBSMReady", sequence: 50, description: "TBSMReady OutputFields", rules: 1, outputViewFlag: false, highRiskRules: 0, lastModified: "3 days ago", impactedReports: 3, blockRiskScore: 10, ruleDensity: 1 },
 ];
 
 const mockSequenceRules: SequenceRule[] = [
@@ -86,7 +303,14 @@ const mockSequenceRules: SequenceRule[] = [
     attributeName: "", 
     type: "QUERY", 
     value: "SELECT convert_date(Control.AsOfDate) as AsOfDate, TRIM(Control.RecordCount) as RecordCount, TRIM(Control.ParValueNotionalSum) as ParValueNotionalSum",
-    outputfile: false
+    outputfile: false,
+    riskScore: 25,
+    impactedFields: ["AsOfDate", "RecordCount", "ParValueNotionalSum"],
+    impactedReports: 5,
+    lastModified: "2 days ago",
+    modifiedBy: "Yu",
+    hasChanges: false,
+    testStatus: "passing"
   },
   { 
     id: "2", 
@@ -94,7 +318,14 @@ const mockSequenceRules: SequenceRule[] = [
     attributeName: "OriginalNotional", 
     type: "EXPRESSION", 
     value: "COALESCE(castfltrim(OriginalFcci) as decimal(22,2)) ,0,0)",
-    outputfile: true
+    outputfile: true,
+    riskScore: 65,
+    impactedFields: ["OriginalNotional", "OriginalFcci"],
+    impactedReports: 12,
+    lastModified: "5 hours ago",
+    modifiedBy: "kapan08",
+    hasChanges: true,
+    testStatus: "untested"
   },
   { 
     id: "3", 
@@ -102,15 +333,74 @@ const mockSequenceRules: SequenceRule[] = [
     attributeName: "OriginalPurchaseNotional", 
     type: "EXPRESSION", 
     value: "COALESCE(castfltrim(OriginalBal) as decimal(22,2)) ,0,0)",
-    outputfile: true
+    outputfile: true,
+    riskScore: 85,
+    impactedFields: ["OriginalPurchaseNotional", "OriginalBal", "AccountBalance"],
+    impactedReports: 18,
+    lastModified: "1 hour ago",
+    modifiedBy: "ginnyzhi",
+    hasChanges: true,
+    testStatus: "failing"
   },
 ];
 
 const recentlyVisited: FeedData[] = [
-  { feed: "USCreditCardCorporate", ruleGroups: 3, rules: 60, lastUpdated: "2 hours ago", status: "active" },
-  { feed: "USDepositsAmeritrade", ruleGroups: 6, rules: 32, lastUpdated: "5 hours ago", status: "active" },
-  { feed: "Deriv_FXFWD", ruleGroups: 4, rules: 15, lastUpdated: "1 day ago", status: "active" },
-  { feed: "USInvestmentPledge", ruleGroups: 2, rules: 61, lastUpdated: "2 days ago", status: "active" },
+  { 
+    feed: "USCreditCardCorporate", 
+    ruleGroups: 3, 
+    rules: 60, 
+    lastUpdated: "2 hours ago", 
+    status: "active",
+    pendingChanges: 3,
+    highRiskRules: 1,
+    lastModified: "2 hours ago",
+    impactedReports: 12,
+    dqFailures: 0,
+    releaseStatus: "staged",
+    healthScore: 75
+  },
+  { 
+    feed: "USDepositsAmeritrade", 
+    ruleGroups: 6, 
+    rules: 32, 
+    lastUpdated: "5 hours ago", 
+    status: "active",
+    pendingChanges: 1,
+    highRiskRules: 0,
+    lastModified: "5 hours ago",
+    impactedReports: 9,
+    dqFailures: 0,
+    releaseStatus: "deployed",
+    healthScore: 82
+  },
+  { 
+    feed: "Deriv_FXFWD", 
+    ruleGroups: 4, 
+    rules: 15, 
+    lastUpdated: "1 day ago", 
+    status: "active",
+    pendingChanges: 3,
+    highRiskRules: 1,
+    lastModified: "2 days ago",
+    impactedReports: 5,
+    dqFailures: 0,
+    releaseStatus: "deployed",
+    healthScore: 85
+  },
+  { 
+    feed: "USInvestmentPledge", 
+    ruleGroups: 2, 
+    rules: 61, 
+    lastUpdated: "2 days ago", 
+    status: "active",
+    pendingChanges: 2,
+    highRiskRules: 1,
+    lastModified: "4 days ago",
+    impactedReports: 7,
+    dqFailures: 1,
+    releaseStatus: "deployed",
+    healthScore: 72
+  },
 ];
 
 interface HistoryChange {
@@ -132,6 +422,28 @@ export function Onboarding() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFeed, setSelectedFeed] = useState<string | null>(null);
   const [selectedRuleGroup, setSelectedRuleGroup] = useState<RuleGroupData | null>(null);
+  
+  // RuleGroup View Mode (Phase 2)
+  const [ruleGroupViewMode, setRuleGroupViewMode] = useState<"table" | "flow">("flow");
+  
+  // Phase 3: Smart Governance States
+  const [testModeEnabled, setTestModeEnabled] = useState(false);
+  const [selectedRuleForImpact, setSelectedRuleForImpact] = useState<SequenceRule | null>(null);
+  const [selectedRuleForLineage, setSelectedRuleForLineage] = useState<SequenceRule | null>(null);
+  const [showImpactPreview, setShowImpactPreview] = useState(false);
+  const [showFieldLineage, setShowFieldLineage] = useState(false);
+
+  // Phase 4: SQL Editor States
+  const [sqlValidation, setSqlValidation] = useState<{errors: string[], warnings: string[], suggestions: string[]}>(  {
+    errors: [],
+    warnings: [],
+    suggestions: []
+  });
+  const [showFieldHelper, setShowFieldHelper] = useState(false);
+  
+  // Enhancement States
+  const [showHealthScoreTooltip, setShowHealthScoreTooltip] = useState<string | null>(null);
+  const [showImpactPreviewPanel, setShowImpactPreviewPanel] = useState(false);
   
   // Filter & Column Configuration States
   const [showFilterPanel, setShowFilterPanel] = useState(false);
@@ -243,6 +555,74 @@ export function Onboarding() {
     setSelectedRuleGroup(null);
   };
 
+  // Phase 3: Risk Score & Status Helpers
+  const getRiskScoreColor = (score: number) => {
+    if (score >= 70) return { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200' };
+    if (score >= 40) return { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' };
+    return { bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-200' };
+  };
+
+  const getTestStatusIcon = (status: string) => {
+    switch (status) {
+      case 'passing': return <CheckCircle2 className="w-4 h-4 text-green-600" />;
+      case 'failing': return <XCircle className="w-4 h-4 text-red-600" />;
+      default: return <AlertCircle className="w-4 h-4 text-gray-400" />;
+    }
+  };
+
+  // Phase 4: SQL Validation & Analysis
+  const validateSQL = (sql: string) => {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+    const suggestions: string[] = [];
+
+    if (!sql.trim()) {
+      errors.push("Query cannot be empty");
+      return { errors, warnings, suggestions };
+    }
+
+    // Check for SELECT *
+    if (/SELECT\s+\*/i.test(sql)) {
+      warnings.push("Using SELECT * can impact performance. Consider specifying column names.");
+    }
+
+    // Check for missing WHERE in UPDATE/DELETE
+    if ((/UPDATE\s+/i.test(sql) || /DELETE\s+FROM/i.test(sql)) && !/WHERE/i.test(sql)) {
+      errors.push("UPDATE/DELETE without WHERE clause detected - this will affect all rows!");
+    }
+
+    // Check for unmatched parentheses
+    const openParen = (sql.match(/\(/g) || []).length;
+    const closeParen = (sql.match(/\)/g) || []).length;
+    if (openParen !== closeParen) {
+      errors.push(`Unmatched parentheses: ${openParen} open, ${closeParen} close`);
+    }
+
+    // Performance suggestions
+    if (/SELECT.*FROM.*WHERE.*OR/i.test(sql) && !/INDEX/i.test(sql)) {
+      suggestions.push("Consider adding indexes for OR conditions to improve performance");
+    }
+
+    // COALESCE optimization
+    if ((sql.match(/COALESCE/gi) || []).length > 3) {
+      suggestions.push("Multiple COALESCE calls detected - consider simplifying logic");
+    }
+
+    // Check for common typos
+    if (/SELCT|FORM|WEHERE/i.test(sql)) {
+      errors.push("Possible typo detected in SQL keywords");
+    }
+
+    return { errors, warnings, suggestions };
+  };
+
+  // Available fields for suggestions
+  const availableFields = [
+    "AsOfDate", "RecordCount", "ParValueNotionalSum", "OriginalNotional", 
+    "OriginalFcci", "OriginalPurchaseNotional", "OriginalBal", "AccountBalance",
+    "LoanId", "CustomerId", "InterestRate", "MaturityDate", "CurrentBalance"
+  ];
+
   const handleEditRule = (rule: SequenceRule) => {
     setEditingRule(rule);
     setEditingRuleData({
@@ -294,14 +674,261 @@ export function Onboarding() {
     setShowFilterPanel(false);
   };
 
+  // Health Score Calculation Details
+  const getHealthScoreBreakdown = (feed: FeedData) => {
+    const breakdown = [];
+    let total = 100;
+
+    if (feed.dqFailures && feed.dqFailures > 0) {
+      breakdown.push({ label: `DQ Failure Weight`, value: -10, detail: `${feed.dqFailures} failures` });
+      total -= 10;
+    }
+
+    if (feed.highRiskRules && feed.highRiskRules > 0) {
+      const deduction = feed.highRiskRules * 4;
+      breakdown.push({ label: `${feed.highRiskRules} High Risk Rules`, value: -deduction });
+      total -= deduction;
+    }
+
+    if (feed.pendingChanges && feed.pendingChanges > 3) {
+      breakdown.push({ label: `${feed.pendingChanges} Pending Changes`, value: -5 });
+      total -= 5;
+    }
+
+    // Positive factors
+    if (feed.lastModified) {
+      const daysAgo = parseInt(feed.lastModified.split(' ')[0]);
+      if (daysAgo > 20) {
+        breakdown.push({ label: `Last Release ${feed.lastModified}`, value: 5 });
+        total += 5;
+      }
+    }
+
+    // Rule test coverage (simulated)
+    breakdown.push({ label: 'Rule Test Coverage 80%', value: 3 });
+    total += 3;
+
+    return { breakdown, total: Math.max(0, Math.min(100, total)) };
+  };
+
   const toggleColumn = (column: keyof typeof visibleColumns) => {
     setVisibleColumns(prev => ({ ...prev, [column]: !prev[column] }));
+  };
+
+  // Helper function to get health score color
+  const getHealthScoreColor = (score: number = 0) => {
+    if (score >= 80) return "text-green-600";
+    if (score >= 60) return "text-orange-600";
+    return "text-red-600";
+  };
+
+  // Helper function to get release status badge style
+  const getReleaseStatusStyle = (status?: string) => {
+    switch (status) {
+      case "deployed":
+        return "bg-green-100 text-green-700 border-green-200";
+      case "staged":
+        return "bg-blue-100 text-blue-700 border-blue-200";
+      case "development":
+        return "bg-purple-100 text-purple-700 border-purple-200";
+      default:
+        return "bg-gray-100 text-gray-700 border-gray-200";
+    }
+  };
+
+  // Render Feed Health Card (Enhanced for Phase 1)
+  const renderFeedHealthCard = (feed: FeedData) => {
+    const feedData = feedsData.find(f => f.feed === feed.feed) || feed;
+    const hasWarnings = (feedData.highRiskRules && feedData.highRiskRules > 0) || 
+                        (feedData.dqFailures && feedData.dqFailures > 0) ||
+                        (feedData.pendingChanges && feedData.pendingChanges > 3);
+
+    return (
+      <Card
+        key={feedData.feed}
+        className="p-5 bg-white border border-gray-200 hover:border-[#5BBD72] hover:shadow-md transition-all cursor-pointer"
+        onClick={() => handleFeedClick(feedData.feed)}
+      >
+        {/* Header with Title and Status */}
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Database className="w-5 h-5 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-sm text-foreground truncate">{feedData.feed}</h3>
+              <div className="flex items-center gap-2 mt-1">
+                <Badge variant="outline" className={`text-xs ${getStatusColor(feedData.status)}`}>
+                  {feedData.status}
+                </Badge>
+                {feedData.releaseStatus && (
+                  <Badge variant="outline" className={`text-xs ${getReleaseStatusStyle(feedData.releaseStatus)}`}>
+                    {feedData.releaseStatus}
+                  </Badge>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          {/* Health Score Badge with Tooltip */}
+          {feedData.healthScore !== undefined && (() => {
+            const { breakdown, total } = getHealthScoreBreakdown(feedData);
+            return (
+              <div className="relative flex flex-col items-end">
+                <button
+                  className={`text-2xl font-bold ${getHealthScoreColor(feedData.healthScore)} cursor-pointer hover:opacity-80 transition-opacity`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowHealthScoreTooltip(showHealthScoreTooltip === feedData.feed ? null : feedData.feed);
+                  }}
+                >
+                  {feedData.healthScore}
+                </button>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <span>Health</span>
+                  <Info className="w-3 h-3" />
+                </div>
+                
+                {/* Tooltip */}
+                {showHealthScoreTooltip === feedData.feed && (
+                  <div className="absolute top-full right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-xl z-50 p-3">
+                    <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-200">
+                      <span className="text-sm font-semibold text-foreground">Health Score Breakdown</span>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowHealthScoreTooltip(null);
+                        }}
+                        className="text-muted-foreground hover:text-foreground"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between py-1">
+                        <span className="text-xs text-foreground font-medium">Base Score</span>
+                        <span className="text-xs font-bold text-foreground">100</span>
+                      </div>
+                      {breakdown.map((item, idx) => (
+                        <div key={idx} className="flex items-center justify-between py-1">
+                          <span className={`text-xs ${item.value < 0 ? 'text-red-600' : 'text-green-600'}`}>
+                            {item.label}
+                          </span>
+                          <span className={`text-xs font-semibold ${item.value < 0 ? 'text-red-600' : 'text-green-600'}`}>
+                            {item.value > 0 ? '+' : ''}{item.value}
+                          </span>
+                        </div>
+                      ))}
+                      <div className="flex items-center justify-between pt-2 border-t border-gray-200">
+                        <span className="text-sm font-bold text-foreground">Final Score</span>
+                        <span className={`text-lg font-bold ${getHealthScoreColor(total)}`}>
+                          {total}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+        </div>
+
+        {/* Core Metrics */}
+        <div className="grid grid-cols-2 gap-3 mb-4 pb-4 border-b border-gray-100">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 bg-blue-50 rounded flex items-center justify-center">
+              <FolderKanban className="w-3.5 h-3.5 text-blue-600" />
+            </div>
+            <div>
+              <div className="text-xs text-muted-foreground">Rule Groups</div>
+              <div className="text-sm font-semibold text-foreground">{feedData.ruleGroups}</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 bg-purple-50 rounded flex items-center justify-center">
+              <FileCode className="w-3.5 h-3.5 text-purple-600" />
+            </div>
+            <div>
+              <div className="text-xs text-muted-foreground">Rules</div>
+              <div className="text-sm font-semibold text-foreground">{feedData.rules}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Health Indicators */}
+        <div className="space-y-2 mb-4">
+          {/* Pending Changes */}
+          {feedData.pendingChanges !== undefined && feedData.pendingChanges > 0 && (
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-3.5 h-3.5 text-orange-600" />
+                <span className="text-muted-foreground">Pending Changes</span>
+              </div>
+              <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">
+                {feedData.pendingChanges}
+              </Badge>
+            </div>
+          )}
+
+          {/* High Risk Rules */}
+          {feedData.highRiskRules !== undefined && feedData.highRiskRules > 0 && (
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-3.5 h-3.5 text-red-600" />
+                <span className="text-muted-foreground">High Risk Rules</span>
+              </div>
+              <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                {feedData.highRiskRules}
+              </Badge>
+            </div>
+          )}
+
+          {/* DQ Failures */}
+          {feedData.dqFailures !== undefined && feedData.dqFailures > 0 && (
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <XCircle className="w-3.5 h-3.5 text-red-600" />
+                <span className="text-muted-foreground">DQ Failures</span>
+              </div>
+              <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                {feedData.dqFailures}
+              </Badge>
+            </div>
+          )}
+
+          {/* Healthy State */}
+          {feedData.pendingChanges === 0 && feedData.highRiskRules === 0 && feedData.dqFailures === 0 && (
+            <div className="flex items-center gap-2 text-xs text-green-600">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>No issues detected</span>
+            </div>
+          )}
+        </div>
+
+        {/* Footer Metrics */}
+        <div className="grid grid-cols-2 gap-3 pt-3 border-t border-gray-100">
+          <div className="flex items-center gap-1.5">
+            <TrendingUp className="w-3 h-3 text-muted-foreground" />
+            <div className="text-xs">
+              <span className="text-muted-foreground">Reports: </span>
+              <span className="font-medium text-foreground">{feedData.impactedReports || 0}</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Clock className="w-3 h-3 text-muted-foreground" />
+            <div className="text-xs text-muted-foreground truncate">
+              {feedData.lastModified || 'No updates'}
+            </div>
+          </div>
+        </div>
+      </Card>
+    );
   };
 
   // Feed List View (Level 1)
   if (!selectedFeed) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen" style={{ backgroundColor: '#f8faf9' }}>
         <div className="p-6 space-y-6">
           {/* Header with Search */}
           <div className="flex items-start justify-between gap-6">
@@ -347,42 +974,8 @@ export function Onboarding() {
           {/* Recently Visited */}
           <div>
             <h2 className="text-sm font-semibold text-foreground mb-3">Recently Visited</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {recentlyVisited.map((feed) => (
-                <Card
-                  key={feed.feed}
-                  className="p-4 bg-white hover:shadow-md transition-shadow cursor-pointer border-0 relative"
-                  onClick={() => handleFeedClick(feed.feed)}
-                >
-                  <Badge variant="outline" className={`absolute top-3 right-3 ${getStatusColor(feed.status)}`}>
-                    {feed.status}
-                  </Badge>
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Database className="w-4 h-4 text-blue-600" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-sm text-foreground truncate">{feed.feed}</h3>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div>
-                      <span className="text-muted-foreground">Rule Groups:</span>
-                      <span className="ml-1 font-medium text-foreground">{feed.ruleGroups}</span>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Rules:</span>
-                      <span className="ml-1 font-medium text-foreground">{feed.rules}</span>
-                    </div>
-                  </div>
-                  {feed.lastUpdated && (
-                    <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
-                      <Clock className="w-3 h-3" />
-                      {feed.lastUpdated}
-                    </div>
-                  )}
-                </Card>
-              ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {recentlyVisited.map((feed) => renderFeedHealthCard(feed))}
             </div>
           </div>
 
@@ -395,36 +988,8 @@ export function Onboarding() {
               </Badge>
             </div>
             {viewMode === "grid" ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {filteredFeeds.map((feed) => (
-                  <Card
-                    key={feed.feed}
-                    className="p-4 bg-white hover:shadow-md transition-shadow cursor-pointer border-0 relative"
-                    onClick={() => handleFeedClick(feed.feed)}
-                  >
-                    <Badge variant="outline" className={`absolute top-3 right-3 ${getStatusColor(feed.status)}`}>
-                      {feed.status}
-                    </Badge>
-                    <div className="flex items-start gap-3 mb-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <FileCode className="w-4 h-4 text-primary" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-sm text-foreground truncate">{feed.feed}</h3>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div>
-                        <span className="text-muted-foreground">Rule Groups:</span>
-                        <span className="ml-1 font-medium text-foreground">{feed.ruleGroups}</span>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Rules:</span>
-                        <span className="ml-1 font-medium text-foreground">{feed.rules}</span>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {filteredFeeds.map((feed) => renderFeedHealthCard(feed))}
               </div>
             ) : (
               <Card className="bg-white border-0">
@@ -436,6 +1001,9 @@ export function Onboarding() {
                           Feed Name
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                          Health Score
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Rule Groups
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -443,6 +1011,24 @@ export function Onboarding() {
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Status
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                          Pending Changes
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                          High Risk Rules
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                          Impacted Reports
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                          DQ Failures
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                          Release Status
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                          Last Modified
                         </th>
                       </tr>
                     </thead>
@@ -453,6 +1039,7 @@ export function Onboarding() {
                           className="hover:bg-gray-50 cursor-pointer"
                           onClick={() => handleFeedClick(feed.feed)}
                         >
+                          {/* Feed Name */}
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center gap-3">
                               <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
@@ -461,12 +1048,100 @@ export function Onboarding() {
                               <span className="text-sm font-medium text-foreground">{feed.feed}</span>
                             </div>
                           </td>
+
+                          {/* Health Score */}
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {feed.healthScore !== undefined && (
+                              <div className="flex items-center gap-2">
+                                <div className="w-9 h-9 rounded-full border flex items-center justify-center"
+                                  style={{
+                                    borderColor: feed.healthScore >= 80 ? '#5BBD72' : feed.healthScore >= 60 ? '#f59e0b' : '#ef4444'
+                                  }}
+                                >
+                                  <span className="text-xs font-bold" style={{
+                                    color: feed.healthScore >= 80 ? '#5BBD72' : feed.healthScore >= 60 ? '#f59e0b' : '#ef4444'
+                                  }}>
+                                    {feed.healthScore}
+                                  </span>
+                                </div>
+                              </div>
+                            )}
+                          </td>
+
+                          {/* Rule Groups */}
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">{feed.ruleGroups}</td>
+
+                          {/* Rules */}
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">{feed.rules}</td>
+
+                          {/* Status */}
                           <td className="px-6 py-4 whitespace-nowrap">
                             <Badge variant="outline" className={getStatusColor(feed.status)}>
                               {feed.status}
                             </Badge>
+                          </td>
+
+                          {/* Pending Changes */}
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {feed.pendingChanges !== undefined && feed.pendingChanges > 0 ? (
+                              <Badge className="bg-amber-100 text-amber-700 border-amber-200">
+                                {feed.pendingChanges}
+                              </Badge>
+                            ) : (
+                              <span className="text-sm text-muted-foreground">-</span>
+                            )}
+                          </td>
+
+                          {/* High Risk Rules */}
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {feed.highRiskRules !== undefined && feed.highRiskRules > 0 ? (
+                              <Badge className="bg-red-100 text-red-700 border-red-200">
+                                {feed.highRiskRules}
+                              </Badge>
+                            ) : (
+                              <span className="text-sm text-muted-foreground">-</span>
+                            )}
+                          </td>
+
+                          {/* Impacted Reports */}
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {feed.impactedReports !== undefined ? (
+                              <span className="text-sm text-foreground">{feed.impactedReports}</span>
+                            ) : (
+                              <span className="text-sm text-muted-foreground">-</span>
+                            )}
+                          </td>
+
+                          {/* DQ Failures */}
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {feed.dqFailures !== undefined && feed.dqFailures > 0 ? (
+                              <Badge className="bg-red-100 text-red-700 border-red-200">
+                                {feed.dqFailures}
+                              </Badge>
+                            ) : (
+                              <span className="text-sm text-green-600">✓</span>
+                            )}
+                          </td>
+
+                          {/* Release Status */}
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {feed.releaseStatus && (
+                              <Badge 
+                                variant="outline" 
+                                className={
+                                  feed.releaseStatus === 'deployed' ? 'bg-green-50 text-green-700 border-green-200' :
+                                  feed.releaseStatus === 'staged' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                                  'bg-gray-50 text-gray-700 border-gray-200'
+                                }
+                              >
+                                {feed.releaseStatus}
+                              </Badge>
+                            )}
+                          </td>
+
+                          {/* Last Modified */}
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                            {feed.lastModified || feed.lastUpdated || '-'}
                           </td>
                         </tr>
                       ))}
@@ -484,7 +1159,7 @@ export function Onboarding() {
   // RuleGroup List View (Level 2)
   if (selectedFeed && !selectedRuleGroup) {
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen" style={{ backgroundColor: '#f8faf9' }}>
         <div className="p-6 space-y-6">
           {/* Header */}
           <div className="flex items-start justify-between gap-6">
@@ -526,10 +1201,29 @@ export function Onboarding() {
 
           {/* Action Buttons Row */}
           <div className="flex items-center justify-between gap-3">
-            <Button size="sm" className="gap-2 bg-[#5BBD72] hover:bg-[#4da862] text-white">
-              <Plus className="w-4 h-4" />
-              Add RuleGroup
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button size="sm" className="gap-2 bg-[#5BBD72] hover:bg-[#4da862] text-white">
+                <Plus className="w-4 h-4" />
+                Add RuleGroup
+              </Button>
+              {/* View Mode Toggle */}
+              <div className="flex border border-gray-200 rounded-md bg-white">
+                <button
+                  onClick={() => setRuleGroupViewMode("flow")}
+                  className={`px-3 py-1.5 text-sm flex items-center gap-2 ${ruleGroupViewMode === "flow" ? "bg-gray-100 text-foreground" : "text-muted-foreground"}`}
+                >
+                  <ArrowRight className="w-3.5 h-3.5" />
+                  DAG View
+                </button>
+                <button
+                  onClick={() => setRuleGroupViewMode("table")}
+                  className={`px-3 py-1.5 text-sm flex items-center gap-2 ${ruleGroupViewMode === "table" ? "bg-gray-100 text-foreground" : "text-muted-foreground"}`}
+                >
+                  <List className="w-3.5 h-3.5" />
+                  Table View
+                </button>
+              </div>
+            </div>
             <div className="flex items-center gap-3">
               <Button variant="outline" size="sm" className="gap-2">
                 <Filter className="w-4 h-4" />
@@ -576,93 +1270,101 @@ export function Onboarding() {
             </Card>
           )}
 
-          {/* RuleGroups Table */}
-          <Card className="bg-white border-0">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="px-4 py-3 w-12">
-                      <Checkbox />
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                      Rulegroup
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                      Sequence
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                      Description
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                      Rules
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                      Output/ViewFlag
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                      Output/ViewName
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {mockRuleGroups.map((rg) => (
-                    <tr key={rg.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-4">
+          {/* RuleGroups Content - DAG View or Table View */}
+          {ruleGroupViewMode === "flow" ? (
+            /* DAG View */
+            <DAGView 
+              nodes={mockRuleGroups}
+              onNodeClick={handleRuleGroupClick}
+              onEditNode={handleEditRuleGroup}
+            />
+          ) : (
+            /* Table View */
+            <Card className="bg-white border-0">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-200">
+                      <th className="px-4 py-3 w-12">
                         <Checkbox />
-                      </td>
-                      <td className="px-4 py-4 text-sm font-medium text-foreground">
-                        {rg.rulegroup}
-                      </td>
-                      <td className="px-4 py-4 text-sm text-foreground">{rg.sequence}</td>
-                      <td className="px-4 py-4 text-sm text-muted-foreground">{rg.description}</td>
-                      <td className="px-4 py-4">
-                        <button
-                          onClick={() => handleRuleGroupClick(rg)}
-                          className="cursor-pointer hover:opacity-80"
-                        >
-                          <Badge variant="outline" className="border-blue-200 text-blue-700 bg-blue-50">
-                            {rg.rules}
-                          </Badge>
-                        </button>
-                      </td>
-                      <td className="px-4 py-4 text-sm text-foreground">{rg.outputViewFlag ? "true" : "false"}</td>
-                      <td className="px-4 py-4 text-sm text-foreground">{rg.outputViewName || "-"}</td>
-                      <td className="px-4 py-4">
-                        <div className="flex items-center gap-2">
-                          <button className="text-muted-foreground hover:text-[#5BBD72] transition-colors">
-                            <Bookmark className="w-4 h-4" />
-                          </button>
-                          <button 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEditRuleGroup(rg);
-                            }}
-                            className="text-muted-foreground hover:text-foreground transition-colors"
-                          >
-                            <Edit2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                        Rulegroup
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                        Sequence
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                        Description
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                        Rules
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                        Output/ViewFlag
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                        Output/ViewName
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                        Action
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="px-6 py-3 border-t border-gray-200 flex items-center justify-between">
-              <div className="text-sm text-muted-foreground">
-                Items per page: <select className="ml-2 border border-gray-200 rounded px-2 py-1">
-                  <option>15</option>
-                  <option>25</option>
-                  <option>50</option>
-                </select>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {mockRuleGroups.map((rg) => (
+                      <tr key={rg.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-4">
+                          <Checkbox />
+                        </td>
+                        <td className="px-4 py-4 text-sm font-medium text-foreground">
+                          {rg.rulegroup}
+                        </td>
+                        <td className="px-4 py-4 text-sm text-foreground">{rg.sequence}</td>
+                        <td className="px-4 py-4 text-sm text-muted-foreground">{rg.description}</td>
+                        <td className="px-4 py-4">
+                          <button
+                            onClick={() => handleRuleGroupClick(rg)}
+                            className="cursor-pointer hover:opacity-80">
+                            <Badge variant="outline" className="border-blue-200 text-blue-700 bg-blue-50">
+                              {rg.rules}
+                            </Badge>
+                          </button>
+                        </td>
+                        <td className="px-4 py-4 text-sm text-foreground">{rg.outputViewFlag ? "true" : "false"}</td>
+                        <td className="px-4 py-4 text-sm text-foreground">{rg.outputViewName || "-"}</td>
+                        <td className="px-4 py-4">
+                          <div className="flex items-center gap-2">
+                            <button className="text-muted-foreground hover:text-[#5BBD72] transition-colors">
+                              <Bookmark className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditRuleGroup(rg);
+                              }}
+                              className="text-muted-foreground hover:text-foreground transition-colors">
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-              <div className="text-sm text-muted-foreground">1 - 4 of 4</div>
-            </div>
-          </Card>
+              <div className="px-6 py-3 border-t border-gray-200 flex items-center justify-between">
+                <div className="text-sm text-muted-foreground">
+                  Items per page: <select className="ml-2 border border-gray-200 rounded px-2 py-1">
+                    <option>15</option>
+                    <option>25</option>
+                    <option>50</option>
+                  </select>
+                </div>
+                <div className="text-sm text-muted-foreground">1 - 4 of 4</div>
+              </div>
+            </Card>
+          )}
         </div>
         
         {/* Edit RuleGroup Dialog */}
@@ -682,7 +1384,7 @@ export function Onboarding() {
                   <Input
                     value={editRuleGroupForm.rulegroup}
                     onChange={(e) => setEditRuleGroupForm({...editRuleGroupForm, rulegroup: e.target.value})}
-                    className="bg-white border border-gray-300"
+                    className="bg-white"
                   />
                 </div>
                 <div>
@@ -690,7 +1392,7 @@ export function Onboarding() {
                   <Input
                     value={editRuleGroupForm.sequence}
                     onChange={(e) => setEditRuleGroupForm({...editRuleGroupForm, sequence: e.target.value})}
-                    className="bg-white border border-gray-300"
+                    className="bg-white"
                   />
                 </div>
                 <div>
@@ -698,7 +1400,7 @@ export function Onboarding() {
                   <Input
                     value={editRuleGroupForm.description}
                     onChange={(e) => setEditRuleGroupForm({...editRuleGroupForm, description: e.target.value})}
-                    className="bg-white border border-gray-300"
+                    className="bg-white"
                     placeholder="description"
                   />
                 </div>
@@ -709,7 +1411,7 @@ export function Onboarding() {
                 <Input
                   value={editRuleGroupForm.outputViewName}
                   onChange={(e) => setEditRuleGroupForm({...editRuleGroupForm, outputViewName: e.target.value})}
-                  className="bg-white border border-gray-300"
+                  className="bg-white"
                   placeholder="outputViewName"
                 />
               </div>
@@ -752,7 +1454,7 @@ export function Onboarding() {
 
   // Sequence List View (Level 3)
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" style={{ backgroundColor: '#f8faf9' }}>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-start justify-between gap-6">
@@ -801,14 +1503,32 @@ export function Onboarding() {
 
         {/* Action Buttons Row */}
         <div className="flex items-center justify-between gap-3">
-          <Button 
-            onClick={() => setShowAddRowDialog(true)} 
-            size="sm" 
-            className="gap-2 bg-[#5BBD72] hover:bg-[#4da862] text-white"
-          >
-            <Plus className="w-4 h-4" />
-            Add Row
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button 
+              onClick={() => setShowAddRowDialog(true)} 
+              size="sm" 
+              className="gap-2 bg-[#5BBD72] hover:bg-[#4da862] text-white"
+            >
+              <Plus className="w-4 h-4" />
+              Add Row
+            </Button>
+            {/* Test Mode Toggle */}
+            <button
+              onClick={() => setTestModeEnabled(!testModeEnabled)}
+              className={`px-4 py-2 text-sm rounded-md font-medium transition-all ${
+                testModeEnabled 
+                  ? 'bg-[#5BBD72] text-white shadow-md' 
+                  : 'bg-gray-100 text-muted-foreground hover:bg-gray-200'
+              }`}
+            >
+              {testModeEnabled ? '✓ Test Mode ON' : 'Test Mode OFF'}
+            </button>
+            {testModeEnabled && (
+              <Badge className="bg-amber-100 text-amber-700 border-amber-200">
+                Changes won't affect production
+              </Badge>
+            )}
+          </div>
           <div className="flex items-center gap-3">
             <Button 
               onClick={() => setShowFilterPanel(!showFilterPanel)} 
@@ -850,7 +1570,6 @@ export function Onboarding() {
                   <option value="sequence">sequence</option>
                   <option value="attributeName">attributeName</option>
                   <option value="type">type</option>
-                  <option value="value">value</option>
                   <option value="description">description</option>
                   <option value="outputfile">outputfile</option>
                 </select>
@@ -969,6 +1688,16 @@ export function Onboarding() {
                       Outputfile
                     </th>
                   )}
+                  {/* Phase 3: Smart Governance Columns */}
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                    Risk Score
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                    Impact
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
+                    Status
+                  </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
                     Action
                   </th>
@@ -1004,6 +1733,59 @@ export function Onboarding() {
                     {visibleColumns.outputfile && (
                       <td className="px-4 py-4 text-sm text-foreground">{rule.outputfile ? "true" : "false"}</td>
                     )}
+                    
+                    {/* Phase 3: Risk Score Column */}
+                    <td className="px-4 py-4">
+                      {rule.riskScore !== undefined && (
+                        <Badge 
+                          variant="outline" 
+                          className={`${getRiskScoreColor(rule.riskScore).bg} ${getRiskScoreColor(rule.riskScore).text} ${getRiskScoreColor(rule.riskScore).border} font-semibold`}
+                        >
+                          {rule.riskScore}
+                        </Badge>
+                      )}
+                    </td>
+
+                    {/* Phase 3: Impact Column */}
+                    <td className="px-4 py-4">
+                      <div className="flex flex-col gap-1">
+                        <button
+                          onClick={() => {
+                            setSelectedRuleForImpact(rule);
+                            setShowImpactPreview(true);
+                          }}
+                          className="text-xs text-primary hover:underline text-left"
+                        >
+                          {rule.impactedReports || 0} reports
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSelectedRuleForLineage(rule);
+                            setShowFieldLineage(true);
+                          }}
+                          className="text-xs text-muted-foreground hover:text-primary hover:underline text-left"
+                        >
+                          {rule.impactedFields?.length || 0} fields
+                        </button>
+                      </div>
+                    </td>
+
+                    {/* Phase 3: Status Column */}
+                    <td className="px-4 py-4">
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-1">
+                          {getTestStatusIcon(rule.testStatus || 'untested')}
+                          <span className="text-xs text-muted-foreground capitalize">{rule.testStatus || 'untested'}</span>
+                        </div>
+                        {rule.hasChanges && (
+                          <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-xs">
+                            Pending
+                          </Badge>
+                        )}
+                      </div>
+                    </td>
+
+                    {/* Action Column */}
                     <td className="px-4 py-4">
                       <button 
                         onClick={() => handleEditRule(rule)}
@@ -1025,7 +1807,7 @@ export function Onboarding() {
                 <option>50</option>
               </select>
             </div>
-            <div className="text-sm text-muted-foreground">1 - 1 of 1</div>
+            <div className="text-sm text-muted-foreground">1 - 3 of 3</div>
           </div>
         </Card>
       </div>
@@ -1048,7 +1830,7 @@ export function Onboarding() {
                 <Input
                   value={editingRuleData.sequence}
                   onChange={(e) => setEditingRuleData({...editingRuleData, sequence: e.target.value})}
-                  className="bg-white border border-gray-300"
+                  className="bg-white"
                 />
               </div>
               <div>
@@ -1056,7 +1838,7 @@ export function Onboarding() {
                 <Input
                   value={editingRuleData.attributeName}
                   onChange={(e) => setEditingRuleData({...editingRuleData, attributeName: e.target.value})}
-                  className="bg-white border border-gray-300"
+                  className="bg-white"
                   placeholder="attributeName"
                 />
               </div>
@@ -1076,7 +1858,7 @@ export function Onboarding() {
                 <Input
                   value={editingRuleData.description}
                   onChange={(e) => setEditingRuleData({...editingRuleData, description: e.target.value})}
-                  className="bg-white border border-gray-300"
+                  className="bg-white"
                   placeholder="description"
                 />
               </div>
@@ -1090,28 +1872,274 @@ export function Onboarding() {
               <label className="text-sm">outputfile</label>
             </div>
 
-            {/* Rule Editor */}
+            {/* Phase 4: Smart SQL Editor */}
             <div className="mb-4">
               <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium">Rule</label>
-                <select className="border border-gray-200 rounded-md px-3 py-1.5 text-xs">
-                  <option>Text Mate</option>
-                  <option>SQL</option>
-                  <option>JSON</option>
-                </select>
+                <label className="text-sm font-medium">Rule - Smart SQL Editor</label>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setShowImpactPreviewPanel(!showImpactPreviewPanel)}
+                    className={`px-3 py-1.5 text-xs rounded-md transition-colors ${showImpactPreviewPanel ? 'bg-primary text-white' : 'bg-primary/10 text-primary hover:bg-primary/20'}`}
+                  >
+                    {showImpactPreviewPanel ? 'Hide' : 'Show'} Impact Preview
+                  </button>
+                  <button
+                    onClick={() => setShowFieldHelper(!showFieldHelper)}
+                    className="px-3 py-1.5 text-xs bg-primary/10 text-primary rounded-md hover:bg-primary/20 transition-colors"
+                  >
+                    {showFieldHelper ? 'Hide' : 'Show'} Field Helper
+                  </button>
+                  <button
+                    onClick={() => {
+                      const validation = validateSQL(editingRuleData.value);
+                      setSqlValidation(validation);
+                    }}
+                    className="px-3 py-1.5 text-xs bg-[#5BBD72] text-white rounded-md hover:bg-[#4da862] transition-colors"
+                  >
+                    Validate Query
+                  </button>
+                </div>
               </div>
-              <div className="bg-gray-50 rounded-lg border border-gray-200 p-4 font-mono text-xs overflow-x-auto max-h-80 overflow-y-auto">
-                <textarea
-                  value={editingRuleData.value}
-                  onChange={(e) => setEditingRuleData({...editingRuleData, value: e.target.value})}
-                  className="w-full bg-transparent border-none outline-none resize-none font-mono text-xs leading-relaxed"
-                  rows={16}
-                  style={{ minHeight: '300px' }}
-                />
+
+              <div className="grid grid-cols-4 gap-4 mb-3">
+                {/* Impact Preview Panel */}
+                {showImpactPreviewPanel && (
+                  <div className="col-span-1">
+                    <Card className="bg-white border border-gray-200 h-full">
+                      <div className="p-3 border-b border-gray-200 bg-amber-50">
+                        <div className="flex items-center gap-2">
+                          <AlertTriangle className="w-4 h-4 text-amber-600" />
+                          <h4 className="text-xs font-semibold text-foreground">Impact Preview</h4>
+                        </div>
+                      </div>
+                      <div className="p-3 space-y-3">
+                        {/* Impacted Fields */}
+                        <div>
+                          <div className="text-xs font-medium text-muted-foreground mb-1.5">Impacted Fields</div>
+                          <div className="space-y-1">
+                            {editingRule?.impactedFields?.map((field, idx) => (
+                              <div key={idx} className="flex items-center gap-2 text-xs">
+                                <div className="w-1.5 h-1.5 bg-primary rounded-full" />
+                                <span className="text-foreground font-mono">{field}</span>
+                              </div>
+                            )) || (
+                              <div className="text-xs text-muted-foreground italic">No fields detected</div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Downstream Dependencies */}
+                        <div className="pt-2 border-t border-gray-100">
+                          <div className="text-xs font-medium text-muted-foreground mb-1.5">Downstream Impact</div>
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-muted-foreground">RuleGroups</span>
+                              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                                3
+                              </Badge>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-muted-foreground">DQ Rules</span>
+                              <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                                2
+                              </Badge>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-muted-foreground">Reports</span>
+                              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                                {editingRule?.impactedReports || 1}
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Risk Level */}
+                        <div className="pt-2 border-t border-gray-100">
+                          <div className="text-xs font-medium text-muted-foreground mb-1.5">Risk Level</div>
+                          <div className={`px-2 py-1 rounded text-xs font-semibold text-center ${
+                            editingRule?.riskScore && editingRule.riskScore >= 70 
+                              ? 'bg-red-50 text-red-700' 
+                              : editingRule?.riskScore && editingRule.riskScore >= 40 
+                              ? 'bg-amber-50 text-amber-700' 
+                              : 'bg-green-50 text-green-700'
+                          }`}>
+                            {editingRule?.riskScore && editingRule.riskScore >= 70 
+                              ? 'High' 
+                              : editingRule?.riskScore && editingRule.riskScore >= 40 
+                              ? 'Medium' 
+                              : 'Low'}
+                          </div>
+                        </div>
+
+                        {/* Additional Info */}
+                        <div className="pt-2 border-t border-gray-100">
+                          <div className="text-[10px] text-muted-foreground italic">
+                            💡 Modifying this rule may require downstream validation
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  </div>
+                )}
+
+                {/* Editor Panel */}
+                <div className={
+                  showImpactPreviewPanel && showFieldHelper ? "col-span-2" : 
+                  showImpactPreviewPanel || showFieldHelper ? "col-span-3" : 
+                  "col-span-4"
+                }>
+                  <div className="bg-gray-900 rounded-lg border-2 border-gray-700 overflow-hidden">
+                    {/* Editor Toolbar */}
+                    <div className="bg-gray-800 px-4 py-2 border-b border-gray-700 flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-xs text-gray-400">
+                        <FileCode className="w-3 h-3" />
+                        <span>SQL Editor</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-gray-400">
+                        <span>{editingRuleData.value.split('\n').length} lines</span>
+                        <span>•</span>
+                        <span>{editingRuleData.value.length} chars</span>
+                      </div>
+                    </div>
+
+                    {/* Editor Content */}
+                    <div className="relative">
+                      <textarea
+                        value={editingRuleData.value}
+                        onChange={(e) => {
+                          setEditingRuleData({...editingRuleData, value: e.target.value});
+                          // Auto-validate on change
+                          const validation = validateSQL(e.target.value);
+                          setSqlValidation(validation);
+                        }}
+                        className="w-full bg-gray-900 text-gray-100 border-none outline-none resize-none font-mono text-sm leading-relaxed p-4"
+                        rows={16}
+                        style={{ minHeight: '300px' }}
+                        spellCheck={false}
+                      />
+                    </div>
+
+                    {/* Status Bar */}
+                    <div className="bg-gray-800 px-4 py-2 border-t border-gray-700 flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-3">
+                        {sqlValidation.errors.length > 0 && (
+                          <span className="text-red-400 flex items-center gap-1">
+                            <XCircle className="w-3 h-3" />
+                            {sqlValidation.errors.length} error{sqlValidation.errors.length > 1 ? 's' : ''}
+                          </span>
+                        )}
+                        {sqlValidation.warnings.length > 0 && (
+                          <span className="text-amber-400 flex items-center gap-1">
+                            <AlertCircle className="w-3 h-3" />
+                            {sqlValidation.warnings.length} warning{sqlValidation.warnings.length > 1 ? 's' : ''}
+                          </span>
+                        )}
+                        {sqlValidation.errors.length === 0 && sqlValidation.warnings.length === 0 && editingRuleData.value.trim() && (
+                          <span className="text-green-400 flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3" />
+                            No issues detected
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-gray-500">Press Ctrl+Space for suggestions</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Field Helper Panel */}
+                {showFieldHelper && (
+                  <div className="col-span-1 space-y-3">
+                    {/* SQL Templates */}
+                    <Card className="bg-white border border-gray-200">
+                      <div className="p-3 border-b border-gray-200">
+                        <h4 className="text-xs font-semibold text-foreground">SQL Templates</h4>
+                      </div>
+                      <div className="p-2 space-y-1">
+                        <button
+                          onClick={() => setEditingRuleData({...editingRuleData, value: "SELECT column1, column2\nFROM table_name\nWHERE condition"})}
+                          className="w-full text-left px-2 py-1.5 text-xs hover:bg-blue-50 rounded transition-colors"
+                        >
+                          <div className="font-medium text-foreground">SELECT Query</div>
+                          <div className="text-muted-foreground text-[10px]">Basic SELECT template</div>
+                        </button>
+                        <button
+                          onClick={() => setEditingRuleData({...editingRuleData, value: "COALESCE(CAST(field AS DECIMAL(22,2)), 0, 0)"})}
+                          className="w-full text-left px-2 py-1.5 text-xs hover:bg-blue-50 rounded transition-colors"
+                        >
+                          <div className="font-medium text-foreground">COALESCE</div>
+                          <div className="text-muted-foreground text-[10px]">Null handling</div>
+                        </button>
+                        <button
+                          onClick={() => setEditingRuleData({...editingRuleData, value: "TRIM(field_name)"})}
+                          className="w-full text-left px-2 py-1.5 text-xs hover:bg-blue-50 rounded transition-colors"
+                        >
+                          <div className="font-medium text-foreground">TRIM</div>
+                          <div className="text-muted-foreground text-[10px]">Remove whitespace</div>
+                        </button>
+                      </div>
+                    </Card>
+
+                    {/* Available Fields */}
+                    <Card className="bg-white border border-gray-200">
+                      <div className="p-3 border-b border-gray-200">
+                        <h4 className="text-xs font-semibold text-foreground">Available Fields</h4>
+                      </div>
+                      <div className="p-2 space-y-1 max-h-[200px] overflow-y-auto">
+                        {availableFields.map((field) => (
+                          <button
+                            key={field}
+                            onClick={() => {
+                              const newValue = editingRuleData.value + (editingRuleData.value ? ', ' : '') + field;
+                              setEditingRuleData({...editingRuleData, value: newValue});
+                            }}
+                            className="w-full text-left px-2 py-1.5 text-xs font-mono text-foreground hover:bg-primary/10 rounded transition-colors"
+                          >
+                            {field}
+                          </button>
+                        ))}
+                      </div>
+                    </Card>
+                  </div>
+                )}
               </div>
-              <div className="text-xs text-muted-foreground mt-1">
-                {editingRuleData.value.split('\n').length} Lines
-              </div>
+
+              {/* Validation Messages */}
+              {(sqlValidation.errors.length > 0 || sqlValidation.warnings.length > 0 || sqlValidation.suggestions.length > 0) && (
+                <div className="space-y-2">
+                  {/* Errors */}
+                  {sqlValidation.errors.map((error, idx) => (
+                    <div key={`error-${idx}`} className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <XCircle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1">
+                        <div className="text-xs font-semibold text-red-900">Error</div>
+                        <div className="text-xs text-red-700">{error}</div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Warnings */}
+                  {sqlValidation.warnings.map((warning, idx) => (
+                    <div key={`warning-${idx}`} className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                      <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1">
+                        <div className="text-xs font-semibold text-amber-900">Warning</div>
+                        <div className="text-xs text-amber-700">{warning}</div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Suggestions */}
+                  {sqlValidation.suggestions.map((suggestion, idx) => (
+                    <div key={`suggestion-${idx}`} className="flex items-start gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <Lightbulb className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1">
+                        <div className="text-xs font-semibold text-blue-900">Suggestion</div>
+                        <div className="text-xs text-blue-700">{suggestion}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="flex items-center justify-between pt-4 border-t border-gray-200">
@@ -1164,13 +2192,11 @@ export function Onboarding() {
                 placeholder="sequence*"
                 value={newRowData.sequence}
                 onChange={(e) => setNewRowData({...newRowData, sequence: e.target.value})}
-                className="border border-gray-300"
               />
               <Input
                 placeholder="attributeName"
                 value={newRowData.attributeName}
                 onChange={(e) => setNewRowData({...newRowData, attributeName: e.target.value})}
-                className="border border-gray-300"
               />
               <select 
                 value={newRowData.type}
@@ -1184,7 +2210,6 @@ export function Onboarding() {
                 placeholder="description"
                 value={newRowData.description}
                 onChange={(e) => setNewRowData({...newRowData, description: e.target.value})}
-                className="border border-gray-300"
               />
             </div>
 
@@ -1216,6 +2241,147 @@ export function Onboarding() {
               <Button onClick={handleAddRow} className="bg-[#5BBD72] hover:bg-[#4da862] text-white">
                 Submit
               </Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Phase 3: Impact Preview Modal */}
+      {showImpactPreview && selectedRuleForImpact && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="bg-white p-6 max-w-3xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-semibold">Impact Preview</h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Rule: {selectedRuleForImpact.attributeName || `Sequence ${selectedRuleForImpact.sequence}`}
+                </p>
+              </div>
+              <button onClick={() => setShowImpactPreview(false)}>
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Risk Score */}
+            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Risk Score</span>
+                <Badge 
+                  className={`${getRiskScoreColor(selectedRuleForImpact.riskScore || 0).bg} ${getRiskScoreColor(selectedRuleForImpact.riskScore || 0).text} font-bold text-lg px-4 py-1`}
+                >
+                  {selectedRuleForImpact.riskScore}/100
+                </Badge>
+              </div>
+            </div>
+
+            {/* Impacted Reports */}
+            <div className="mb-6">
+              <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                <FileWarning className="w-4 h-4 text-primary" />
+                Impacted Reports ({selectedRuleForImpact.impactedReports})
+              </h3>
+              <div className="space-y-2">
+                {['Monthly Balance Sheet', 'Risk Exposure Report', 'Regulatory Filing - FR Y-14', 'Executive Dashboard', 'Credit Risk Analytics'].slice(0, selectedRuleForImpact.impactedReports).map((report, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg">
+                    <span className="text-sm">{report}</span>
+                    <Badge variant="outline" className="text-xs">Active</Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Impacted Fields */}
+            <div className="mb-6">
+              <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                <Database className="w-4 h-4 text-primary" />
+                Impacted Fields ({selectedRuleForImpact.impactedFields?.length || 0})
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {selectedRuleForImpact.impactedFields?.map((field, idx) => (
+                  <Badge key={idx} variant="outline" className="bg-blue-50 border-blue-200 text-blue-700">
+                    {field}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            {/* Change Info */}
+            <div className="border-t pt-4">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Last Modified:</span>
+                  <span className="ml-2 font-medium">{selectedRuleForImpact.lastModified}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Modified By:</span>
+                  <span className="ml-2 font-medium">{selectedRuleForImpact.modifiedBy}</span>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Phase 3: Field Lineage Modal */}
+      {showFieldLineage && selectedRuleForLineage && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="bg-white p-6 max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-semibold">Field Lineage</h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Data flow for {selectedRuleForLineage.attributeName || `Sequence ${selectedRuleForLineage.sequence}`}
+                </p>
+              </div>
+              <button onClick={() => setShowFieldLineage(false)}>
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Lineage Visualization */}
+            <div className="space-y-6">
+              {selectedRuleForLineage.impactedFields?.map((field, idx) => (
+                <div key={idx} className="p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-4">
+                    {/* Source */}
+                    <div className="flex-1">
+                      <div className="text-xs text-muted-foreground mb-1">Source Field</div>
+                      <Badge className="bg-gray-700 text-white">{field}</Badge>
+                    </div>
+                    
+                    {/* Arrow */}
+                    <ArrowRight className="w-6 h-6 text-primary" />
+                    
+                    {/* Transformation */}
+                    <div className="flex-1">
+                      <div className="text-xs text-muted-foreground mb-1">Transformation</div>
+                      <Badge variant="outline" className="bg-blue-50 border-blue-200 text-blue-700">
+                        {selectedRuleForLineage.type}
+                      </Badge>
+                    </div>
+                    
+                    {/* Arrow */}
+                    <ArrowRight className="w-6 h-6 text-primary" />
+                    
+                    {/* Target */}
+                    <div className="flex-1">
+                      <div className="text-xs text-muted-foreground mb-1">Target Field</div>
+                      <Badge className="bg-[#5BBD72] text-white">
+                        {selectedRuleForLineage.attributeName || field}
+                      </Badge>
+                    </div>
+                  </div>
+                  
+                  {/* Usage */}
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <div className="text-xs text-muted-foreground">Used in:</div>
+                    <div className="flex gap-2 mt-1 flex-wrap">
+                      <Badge variant="outline" className="text-xs">Monthly Report</Badge>
+                      <Badge variant="outline" className="text-xs">Risk Dashboard</Badge>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </Card>
         </div>

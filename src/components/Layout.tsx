@@ -6,6 +6,7 @@ import { Onboarding as OnboardingPage } from "./Onboarding";
 import { DataCatalog as DataCatalogPage } from "./DataCatalog";
 import { ReferenceTable as ReferenceTablePage } from "./ReferenceTable";
 import { DataQualityAssessment as DataQualityPage } from "./DataQualityAssessment";
+import { ChangesetPage } from "./ChangesetPage";
 import { Search } from "lucide-react";
 import { Input } from "./ui/input";
 
@@ -58,13 +59,6 @@ const ClearCache = () => (
   </div>
 );
 
-const ImportExport = () => (
-  <div className="p-6">
-    <h1 className="text-3xl mb-4">Import/Export Changesets</h1>
-    <p className="text-muted-foreground">Import and export changesets...</p>
-  </div>
-);
-
 const Backup = () => (
   <div className="p-6">
     <h1 className="text-3xl mb-4">Backup</h1>
@@ -102,7 +96,7 @@ export function Layout() {
       case "clear-cache":
         return <ClearCache />;
       case "import-export":
-        return <ImportExport />;
+        return <ChangesetPage />;
       case "backup":
         return <Backup />;
       case "analytics":
