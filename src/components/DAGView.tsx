@@ -496,41 +496,6 @@ export function DAGView({ nodes, onNodeClick, onEditNode }: DAGViewProps) {
           );
         })}
       </div>
-
-      {/* DAG Legend */}
-      <div className="absolute bottom-6 left-6 bg-white border border-gray-200 rounded-lg shadow-lg p-4 max-w-xs z-20">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="w-2 h-2 bg-primary rounded-full" />
-          <h4 className="text-xs font-semibold text-foreground">DAG View Guide</h4>
-        </div>
-        <div className="space-y-2.5">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-0.5 bg-primary rounded" />
-            <span className="text-xs text-muted-foreground">Normal Flow</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-0.5 bg-amber-500 rounded" />
-            <span className="text-xs text-muted-foreground">Risk Flow</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-[10px] font-bold">!</span>
-            </div>
-            <span className="text-xs text-muted-foreground">High Risk Node</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-primary/10 rounded flex items-center justify-center">
-              <span className="text-primary text-[10px] font-bold">#N</span>
-            </div>
-            <span className="text-xs text-muted-foreground">Sequence Number</span>
-          </div>
-        </div>
-        <div className="mt-3 pt-3 border-t border-gray-100">
-          <p className="text-[10px] text-muted-foreground italic">
-            💡 Hover over nodes for details, click to view rules
-          </p>
-        </div>
-      </div>
       </div>
     </div>
   );
