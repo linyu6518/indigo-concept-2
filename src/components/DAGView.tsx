@@ -128,6 +128,9 @@ export function DAGView({ nodes, onNodeClick, onEditNode }: DAGViewProps) {
   const handleNodeDragStart = useCallback(
     (e: React.MouseEvent, nodeId: string, index: number) => {
       if (e.button !== 0) return;
+      // Don't start drag when clicking buttons (Edit, View Rules) so they remain clickable
+      const target = e.target as HTMLElement;
+      if (target.closest?.("button")) return;
       e.stopPropagation();
       const pos = getEffectiveNodePosition(index, sortedNodes.length);
       nodeDragRef.current = {
@@ -457,19 +460,27 @@ export function DAGView({ nodes, onNodeClick, onEditNode }: DAGViewProps) {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
+                {/* Action Buttons - clicks must not start node drag */}
                 <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                  <button 
+                  <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       onEditNode(rg);
                     }}
-                    className="text-xs text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+                    className="text-xs text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 cursor-pointer"
                   >
                     <Edit2 className="w-3 h-3" />
                     Edit
                   </button>
-                  <button className="text-xs text-primary hover:text-primary/80 transition-colors flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onNodeClick(rg);
+                    }}
+                    className="text-xs text-primary hover:text-primary/80 transition-colors flex items-center gap-1 cursor-pointer"
+                  >
                     View Rules
                     <ArrowRight className="w-3 h-3" />
                   </button>

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { DAGView } from "./DAGView";
@@ -510,6 +510,7 @@ export function Onboarding() {
     suggestions: []
   });
   const [showFieldHelper, setShowFieldHelper] = useState(false);
+  const sqlValidationDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   // Enhancement States
   const [showHealthScoreTooltip, setShowHealthScoreTooltip] = useState<string | null>(null);
@@ -685,6 +686,23 @@ export function Onboarding() {
 
     return { errors, warnings, suggestions };
   };
+
+  // Debounced auto-validation when SQL value changes (avoids validating on every keystroke)
+  useEffect(() => {
+    if (!editingRule) return;
+    const value = editingRuleData.value;
+    if (sqlValidationDebounceRef.current) clearTimeout(sqlValidationDebounceRef.current);
+    sqlValidationDebounceRef.current = setTimeout(() => {
+      setSqlValidation(validateSQL(value));
+      sqlValidationDebounceRef.current = null;
+    }, 400);
+    return () => {
+      if (sqlValidationDebounceRef.current) {
+        clearTimeout(sqlValidationDebounceRef.current);
+        sqlValidationDebounceRef.current = null;
+      }
+    };
+  }, [editingRuleData.value, editingRule]);
 
   // Available fields for suggestions
   const availableFields = [
@@ -1958,40 +1976,123 @@ export function Onboarding() {
               <label className="text-sm">outputfile</label>
             </div>
 
-            {/* Phase 4: Smart SQL Editor */}
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium">Rule - Smart SQL Editor</label>
-                <div className="flex items-center gap-2">
+            {/* Phase 4: Smart SQL Editor - buttons outside editor */}
+            <div className="mb-4 w-full min-w-0">
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <span className="text-sm font-medium text-foreground">Rule - Smart SQL Editor</span>
+                <div className="flex flex-wrap items-center gap-2">
                   <button
+                    type="button"
                     onClick={() => setShowImpactPreviewPanel(!showImpactPreviewPanel)}
                     className={`px-3 py-1.5 text-xs rounded-md transition-colors ${showImpactPreviewPanel ? 'bg-primary text-white' : 'bg-primary/10 text-primary hover:bg-primary/20'}`}
                   >
                     {showImpactPreviewPanel ? 'Hide' : 'Show'} Impact Preview
                   </button>
                   <button
+                    type="button"
                     onClick={() => setShowFieldHelper(!showFieldHelper)}
-                    className="px-3 py-1.5 text-xs bg-primary/10 text-primary rounded-md hover:bg-primary/20 transition-colors"
+                    className={`px-3 py-1.5 text-xs rounded-md transition-colors ${showFieldHelper ? 'bg-primary text-white' : 'bg-primary/10 text-primary hover:bg-primary/20'}`}
                   >
                     {showFieldHelper ? 'Hide' : 'Show'} Field Helper
                   </button>
                   <button
-                    onClick={() => {
-                      const validation = validateSQL(editingRuleData.value);
-                      setSqlValidation(validation);
-                    }}
-                    className="px-3 py-1.5 text-xs bg-[#5BBD72] text-white rounded-md hover:bg-[#4da862] transition-colors"
+                    type="button"
+                    onClick={() => setSqlValidation(validateSQL(editingRuleData.value))}
+                    className="px-3 py-1.5 text-xs rounded-md bg-[#5BBD72] text-white hover:bg-[#4da862] transition-colors"
                   >
                     Validate Query
                   </button>
                 </div>
               </div>
 
-              <div className="grid grid-cols-4 gap-4 mb-3">
-                {/* Impact Preview Panel */}
+              <div className="flex gap-4 w-full min-w-0">
+                {/* Editor - single visible frame */}
+                <div className="flex-1 min-w-0">
+                  <div
+                    className="w-full min-w-0 rounded-lg overflow-hidden shadow-md"
+                    style={{ backgroundColor: "#0f172a", border: "1px solid #475569" }}
+                  >
+                      {/* Toolbar - title + line count only */}
+                      <div
+                        className="px-3 py-2 flex items-center justify-between gap-2"
+                        style={{ backgroundColor: "#1e293b", borderBottom: "1px solid #475569" }}
+                      >
+                        <div className="flex items-center gap-2 text-xs" style={{ color: "#cbd5e1" }}>
+                          <FileCode className="w-3.5 h-3.5" style={{ color: "#94a3b8" }} />
+                          <span className="font-medium">SQL Editor</span>
+                        </div>
+                        <span className="text-xs tabular-nums" style={{ color: "#94a3b8" }}>
+                          {editingRuleData.value.split("\n").length} line{(editingRuleData.value.split("\n").length !== 1) ? "s" : ""} • {editingRuleData.value.length} chars
+                        </span>
+                      </div>
+
+                    {/* Editor Content - dark */}
+                    <div className="relative" style={{ backgroundColor: "#0f172a" }}>
+                      <textarea
+                        value={editingRuleData.value}
+                        onChange={(e) => setEditingRuleData({ ...editingRuleData, value: e.target.value })}
+                        onKeyDown={(e) => {
+                          if (e.key === "Tab") {
+                            e.preventDefault();
+                            const ta = e.currentTarget;
+                            const start = ta.selectionStart;
+                            const end = ta.selectionEnd;
+                            const next = ta.value.slice(0, start) + "  " + ta.value.slice(end);
+                            setEditingRuleData({ ...editingRuleData, value: next });
+                            requestAnimationFrame(() => {
+                              ta.selectionStart = ta.selectionEnd = start + 2;
+                            });
+                          }
+                        }}
+                        placeholder="Enter SQL query or expression..."
+                        className="w-full border-none outline-none resize-y font-mono text-sm leading-relaxed p-4 placeholder:text-slate-500"
+                        rows={12}
+                        style={{
+                          minHeight: "280px",
+                          maxHeight: "50vh",
+                          backgroundColor: "#0f172a",
+                          color: "#f1f5f9",
+                        }}
+                        spellCheck={false}
+                      />
+                    </div>
+
+                    {/* Status Bar - dark */}
+                    <div
+                      className="px-3 py-2 flex items-center justify-between gap-4 text-xs flex-wrap"
+                      style={{ backgroundColor: "#1e293b", borderTop: "1px solid #475569" }}
+                    >
+                      <div className="flex items-center gap-3 min-w-0 flex-shrink">
+                        {sqlValidation.errors.length > 0 && (
+                          <span className="text-red-400 flex items-center gap-1.5 whitespace-nowrap">
+                            <XCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                            {sqlValidation.errors.length} error{sqlValidation.errors.length > 1 ? "s" : ""}
+                          </span>
+                        )}
+                        {sqlValidation.warnings.length > 0 && (
+                          <span className="text-amber-400 flex items-center gap-1.5 whitespace-nowrap">
+                            <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                            {sqlValidation.warnings.length} warning{sqlValidation.warnings.length > 1 ? "s" : ""}
+                          </span>
+                        )}
+                        {sqlValidation.errors.length === 0 && sqlValidation.warnings.length === 0 && editingRuleData.value.trim() && (
+                          <span className="text-emerald-400 flex items-center gap-1.5 whitespace-nowrap">
+                            <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
+                            No issues detected
+                          </span>
+                        )}
+                      </div>
+                      <span className="whitespace-nowrap flex-shrink-0" style={{ color: "#94a3b8" }}>
+                        Press Ctrl+Space for suggestions
+                      </span>
+                    </div>
+                    </div>
+                  </div>
+
+                {/* Impact Preview Panel - fixed width right */}
                 {showImpactPreviewPanel && (
-                  <div className="col-span-1">
-                    <Card className="bg-white border border-gray-200 h-full">
+                  <div className="w-64 shrink-0">
+                    <Card className="bg-white border border-gray-200">
                       <div className="p-3 border-b border-gray-200 bg-amber-50">
                         <div className="flex items-center gap-2">
                           <AlertTriangle className="w-4 h-4 text-amber-600" />
@@ -1999,7 +2100,6 @@ export function Onboarding() {
                         </div>
                       </div>
                       <div className="p-3 space-y-3">
-                        {/* Impacted Fields */}
                         <div>
                           <div className="text-xs font-medium text-muted-foreground mb-1.5">Impacted Fields</div>
                           <div className="space-y-1">
@@ -2013,129 +2113,43 @@ export function Onboarding() {
                             )}
                           </div>
                         </div>
-
-                        {/* Downstream Dependencies */}
                         <div className="pt-2 border-t border-gray-100">
                           <div className="text-xs font-medium text-muted-foreground mb-1.5">Downstream Impact</div>
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
                               <span className="text-xs text-muted-foreground">RuleGroups</span>
-                              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                                3
-                              </Badge>
+                              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">3</Badge>
                             </div>
                             <div className="flex items-center justify-between">
                               <span className="text-xs text-muted-foreground">DQ Rules</span>
-                              <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
-                                2
-                              </Badge>
+                              <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">2</Badge>
                             </div>
                             <div className="flex items-center justify-between">
                               <span className="text-xs text-muted-foreground">Reports</span>
-                              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                                {editingRule?.impactedReports || 1}
-                              </Badge>
+                              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">{editingRule?.impactedReports || 1}</Badge>
                             </div>
                           </div>
                         </div>
-
-                        {/* Risk Level */}
                         <div className="pt-2 border-t border-gray-100">
                           <div className="text-xs font-medium text-muted-foreground mb-1.5">Risk Level</div>
                           <div className={`px-2 py-1 rounded text-xs font-semibold text-center ${
-                            editingRule?.riskScore && editingRule.riskScore >= 70 
-                              ? 'bg-red-50 text-red-700' 
-                              : editingRule?.riskScore && editingRule.riskScore >= 40 
-                              ? 'bg-amber-50 text-amber-700' 
-                              : 'bg-green-50 text-green-700'
+                            editingRule?.riskScore && editingRule.riskScore >= 70 ? 'bg-red-50 text-red-700' :
+                            editingRule?.riskScore && editingRule.riskScore >= 40 ? 'bg-amber-50 text-amber-700' : 'bg-green-50 text-green-700'
                           }`}>
-                            {editingRule?.riskScore && editingRule.riskScore >= 70 
-                              ? 'High' 
-                              : editingRule?.riskScore && editingRule.riskScore >= 40 
-                              ? 'Medium' 
-                              : 'Low'}
+                            {editingRule?.riskScore && editingRule.riskScore >= 70 ? 'High' : editingRule?.riskScore && editingRule.riskScore >= 40 ? 'Medium' : 'Low'}
                           </div>
                         </div>
-
-                        {/* Additional Info */}
                         <div className="pt-2 border-t border-gray-100">
-                          <div className="text-[10px] text-muted-foreground italic">
-                            💡 Modifying this rule may require downstream validation
-                          </div>
+                          <div className="text-[10px] text-muted-foreground italic">💡 Modifying this rule may require downstream validation</div>
                         </div>
                       </div>
                     </Card>
                   </div>
                 )}
 
-                {/* Editor Panel */}
-                <div className={
-                  showImpactPreviewPanel && showFieldHelper ? "col-span-2" : 
-                  showImpactPreviewPanel || showFieldHelper ? "col-span-3" : 
-                  "col-span-4"
-                }>
-                  <div className="bg-gray-900 rounded-lg border-2 border-gray-700 overflow-hidden">
-                    {/* Editor Toolbar */}
-                    <div className="bg-gray-800 px-4 py-2 border-b border-gray-700 flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-xs text-gray-400">
-                        <FileCode className="w-3 h-3" />
-                        <span>SQL Editor</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-gray-400">
-                        <span>{editingRuleData.value.split('\n').length} lines</span>
-                        <span>•</span>
-                        <span>{editingRuleData.value.length} chars</span>
-                      </div>
-                    </div>
-
-                    {/* Editor Content */}
-                    <div className="relative">
-                      <textarea
-                        value={editingRuleData.value}
-                        onChange={(e) => {
-                          setEditingRuleData({...editingRuleData, value: e.target.value});
-                          // Auto-validate on change
-                          const validation = validateSQL(e.target.value);
-                          setSqlValidation(validation);
-                        }}
-                        className="w-full bg-gray-900 text-gray-100 border-none outline-none resize-none font-mono text-sm leading-relaxed p-4"
-                        rows={16}
-                        style={{ minHeight: '300px' }}
-                        spellCheck={false}
-                      />
-                    </div>
-
-                    {/* Status Bar */}
-                    <div className="bg-gray-800 px-4 py-2 border-t border-gray-700 flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-3">
-                        {sqlValidation.errors.length > 0 && (
-                          <span className="text-red-400 flex items-center gap-1">
-                            <XCircle className="w-3 h-3" />
-                            {sqlValidation.errors.length} error{sqlValidation.errors.length > 1 ? 's' : ''}
-                          </span>
-                        )}
-                        {sqlValidation.warnings.length > 0 && (
-                          <span className="text-amber-400 flex items-center gap-1">
-                            <AlertCircle className="w-3 h-3" />
-                            {sqlValidation.warnings.length} warning{sqlValidation.warnings.length > 1 ? 's' : ''}
-                          </span>
-                        )}
-                        {sqlValidation.errors.length === 0 && sqlValidation.warnings.length === 0 && editingRuleData.value.trim() && (
-                          <span className="text-green-400 flex items-center gap-1">
-                            <CheckCircle2 className="w-3 h-3" />
-                            No issues detected
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-gray-500">Press Ctrl+Space for suggestions</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Field Helper Panel */}
+                {/* Field Helper Panel - fixed width right */}
                 {showFieldHelper && (
-                  <div className="col-span-1 space-y-3">
-                    {/* SQL Templates */}
+                  <div className="w-64 shrink-0 space-y-3">
                     <Card className="bg-white border border-gray-200">
                       <div className="p-3 border-b border-gray-200">
                         <h4 className="text-xs font-semibold text-foreground">SQL Templates</h4>
@@ -2189,9 +2203,9 @@ export function Onboarding() {
                 )}
               </div>
 
-              {/* Validation Messages */}
+              {/* Validation Messages - gap from editor above */}
               {(sqlValidation.errors.length > 0 || sqlValidation.warnings.length > 0 || sqlValidation.suggestions.length > 0) && (
-                <div className="space-y-2">
+                <div className="mt-4 space-y-2">
                   {/* Errors */}
                   {sqlValidation.errors.map((error, idx) => (
                     <div key={`error-${idx}`} className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
