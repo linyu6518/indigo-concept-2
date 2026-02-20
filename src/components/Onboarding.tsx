@@ -682,7 +682,7 @@ export function Onboarding() {
                   <Input
                     value={editRuleGroupForm.rulegroup}
                     onChange={(e) => setEditRuleGroupForm({...editRuleGroupForm, rulegroup: e.target.value})}
-                    className="bg-white"
+                    className="bg-white border border-gray-300"
                   />
                 </div>
                 <div>
@@ -690,7 +690,7 @@ export function Onboarding() {
                   <Input
                     value={editRuleGroupForm.sequence}
                     onChange={(e) => setEditRuleGroupForm({...editRuleGroupForm, sequence: e.target.value})}
-                    className="bg-white"
+                    className="bg-white border border-gray-300"
                   />
                 </div>
                 <div>
@@ -698,7 +698,7 @@ export function Onboarding() {
                   <Input
                     value={editRuleGroupForm.description}
                     onChange={(e) => setEditRuleGroupForm({...editRuleGroupForm, description: e.target.value})}
-                    className="bg-white"
+                    className="bg-white border border-gray-300"
                     placeholder="description"
                   />
                 </div>
@@ -709,7 +709,7 @@ export function Onboarding() {
                 <Input
                   value={editRuleGroupForm.outputViewName}
                   onChange={(e) => setEditRuleGroupForm({...editRuleGroupForm, outputViewName: e.target.value})}
-                  className="bg-white"
+                  className="bg-white border border-gray-300"
                   placeholder="outputViewName"
                 />
               </div>
@@ -1048,7 +1048,7 @@ export function Onboarding() {
                 <Input
                   value={editingRuleData.sequence}
                   onChange={(e) => setEditingRuleData({...editingRuleData, sequence: e.target.value})}
-                  className="bg-white"
+                  className="bg-white border border-gray-300"
                 />
               </div>
               <div>
@@ -1056,7 +1056,7 @@ export function Onboarding() {
                 <Input
                   value={editingRuleData.attributeName}
                   onChange={(e) => setEditingRuleData({...editingRuleData, attributeName: e.target.value})}
-                  className="bg-white"
+                  className="bg-white border border-gray-300"
                   placeholder="attributeName"
                 />
               </div>
@@ -1076,7 +1076,7 @@ export function Onboarding() {
                 <Input
                   value={editingRuleData.description}
                   onChange={(e) => setEditingRuleData({...editingRuleData, description: e.target.value})}
-                  className="bg-white"
+                  className="bg-white border border-gray-300"
                   placeholder="description"
                 />
               </div>
@@ -1164,11 +1164,13 @@ export function Onboarding() {
                 placeholder="sequence*"
                 value={newRowData.sequence}
                 onChange={(e) => setNewRowData({...newRowData, sequence: e.target.value})}
+                className="border border-gray-300"
               />
               <Input
                 placeholder="attributeName"
                 value={newRowData.attributeName}
                 onChange={(e) => setNewRowData({...newRowData, attributeName: e.target.value})}
+                className="border border-gray-300"
               />
               <select 
                 value={newRowData.type}
@@ -1182,6 +1184,7 @@ export function Onboarding() {
                 placeholder="description"
                 value={newRowData.description}
                 onChange={(e) => setNewRowData({...newRowData, description: e.target.value})}
+                className="border border-gray-300"
               />
             </div>
 

@@ -16,8 +16,9 @@ import {
   ArrowUpDown,
   Archive,
   FolderKanban,
-  Settings,
-  ChevronDown
+  ChevronDown,
+  Wrench,
+  Shield
 } from "lucide-react";
 
 interface SidebarProps {
@@ -27,7 +28,9 @@ interface SidebarProps {
 
 export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isConfigExpanded, setIsConfigExpanded] = useState(false);
+  const [isGovernanceExpanded, setIsGovernanceExpanded] = useState(false);
+  const [isToolsExpanded, setIsToolsExpanded] = useState(false);
+  const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
 
   const handleNavigationClick = (pageId: string) => {
@@ -83,62 +86,134 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
     }
   ];
 
-  const configurationItems = [
-    {
-      id: "promotion-manager",
-      name: "Promotion Manager",
-      icon: Megaphone,
-      description: "Manage promotions"
-    },
-    {
-      id: "rule-validator",
-      name: "Rule Validator",
-      icon: Clock,
-      description: "Validate rules"
-    },
-    {
-      id: "query-engine",
-      name: "Query Engine",
-      icon: Search,
-      description: "Query data"
-    },
-    {
-      id: "manage-feeds",
-      name: "Manage Feeds",
-      icon: List,
-      description: "Feed management"
-    },
-    {
-      id: "manage-users",
-      name: "Manage Users",
-      icon: Users,
-      description: "User management"
-    },
-    {
-      id: "release-version",
-      name: "Release Version",
-      icon: Tag,
-      description: "Version control"
-    },
-    {
-      id: "clear-cache",
-      name: "Clear Cache",
-      icon: RefreshCw,
-      description: "Clear system cache"
-    },
-    {
-      id: "import-export",
-      name: "Import/Export Changesets",
-      icon: ArrowUpDown,
-      description: "Import and export"
-    },
-    {
-      id: "backup",
-      name: "Backup",
-      icon: Archive,
-      description: "System backup"
-    }
+  const governanceItems = [
+    { id: "import-export", name: "Changesets", icon: ArrowUpDown, description: "Import and export" },
+    { id: "promotion-manager", name: "Promotion Pipeline", icon: Megaphone, description: "Manage promotions" },
+    { id: "release-version", name: "Release Management", icon: Tag, description: "Version control" }
   ];
+
+  const toolsItems = [
+    { id: "rule-validator", name: "Rule Validator", icon: Clock, description: "Validate rules" },
+    { id: "query-engine", name: "Query Engine", icon: Search, description: "Query data" },
+    { id: "manage-feeds", name: "Manage Feeds", icon: List, description: "Feed management" }
+  ];
+
+  const administrationItems = [
+    { id: "manage-users", name: "Manage Users", icon: Users, description: "User management" },
+    { id: "import-export", name: "Import / Export", icon: ArrowUpDown, description: "Import and export" },
+    { id: "clear-cache", name: "Cache", icon: RefreshCw, description: "Clear system cache" },
+    { id: "backup", name: "Backup", icon: Archive, description: "System backup" }
+  ];
+
+  const renderSection = (
+    sectionId: string,
+    sectionTitle: string,
+    sectionDescription: string,
+    SectionIcon: React.ComponentType<{ className?: string }>,
+    isSectionExpanded: boolean,
+    setSectionExpanded: (v: boolean) => void,
+    items: Array<{ id: string; name: string; icon: React.ComponentType<{ className?: string }>; description: string }>
+  ) => (
+    <div key={sectionId} className="mt-4 first:mt-0">
+      <div className="mb-3 flex-shrink-0 px-4" aria-hidden>
+        <div className="w-full" style={{ height: 1, background: 'rgba(0,0,0,0.2)' }} />
+      </div>
+      <button
+        className={cn(
+          "transition-all duration-300 flex items-center relative overflow-hidden w-full",
+          "hover:scale-110",
+          isExpanded ? "w-full px-4 py-3 justify-start rounded-xl min-h-[2.75rem]" : "w-12 h-12 justify-center mx-auto rounded-full",
+          isSectionExpanded
+            ? "bg-gradient-to-br from-sidebar-primary to-sidebar-primary/80 shadow-lg shadow-sidebar-primary/30 scale-105"
+            : "bg-gradient-to-br from-sidebar-accent to-sidebar-accent/80 hover:from-sidebar-primary/80 hover:to-sidebar-primary/60"
+        )}
+        onClick={() => setSectionExpanded(!isSectionExpanded)}
+      >
+        <SectionIcon className={cn(
+          "transition-colors duration-300 flex-shrink-0 w-5 h-5",
+          isSectionExpanded ? "text-sidebar-primary-foreground" : "text-sidebar-accent-foreground group-hover:text-sidebar-primary-foreground"
+        )} />
+        {isExpanded && (
+          <div className="ml-3 overflow-hidden min-h-[2.25rem] flex flex-col justify-center items-start text-left">
+            <div className={cn(
+              "font-medium text-sm whitespace-nowrap transition-colors duration-300",
+              isSectionExpanded ? "text-sidebar-primary-foreground" : "text-sidebar-accent-foreground group-hover:text-sidebar-primary-foreground"
+            )}>
+              {sectionTitle}
+            </div>
+            <div className={cn(
+              "text-xs mt-0.5 whitespace-nowrap transition-colors duration-300",
+              isSectionExpanded ? "text-sidebar-primary-foreground" : "text-white opacity-50 group-hover:text-sidebar-primary-foreground group-hover:opacity-100"
+            )}>
+              {sectionDescription}
+            </div>
+          </div>
+        )}
+        {isSectionExpanded && !isExpanded && (
+          <>
+            <div className="absolute inset-0 rounded-full bg-sidebar-primary opacity-20 animate-pulse" />
+            <div className="absolute -right-2 top-1/2 -translate-y-1/2 w-1 h-6 bg-sidebar-primary rounded-l-full" />
+          </>
+        )}
+        {isSectionExpanded && isExpanded && (
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 w-2 h-2 bg-sidebar-primary-foreground rounded-full animate-pulse" />
+        )}
+      </button>
+      {isSectionExpanded && (
+        <div className="mt-2 space-y-2">
+          {items.map((item) => {
+            const Icon = item.icon;
+            const isActive = currentPage === item.id;
+            return (
+              <div key={item.id} className="relative group">
+                <button
+                  onClick={() => handleNavigationClick(item.id)}
+                  className={cn(
+                    "transition-all duration-300 flex items-center relative overflow-hidden w-full",
+                    "hover:scale-110",
+                    isExpanded ? "w-full px-4 py-3 justify-start rounded-xl min-h-[2.75rem]" : "w-12 h-12 justify-center mx-auto rounded-full",
+                    isActive
+                      ? "bg-gradient-to-br from-sidebar-primary to-sidebar-primary/80 shadow-lg shadow-sidebar-primary/30 scale-105"
+                      : "bg-gradient-to-br from-sidebar-accent to-sidebar-accent/80 hover:from-sidebar-primary/80 hover:to-sidebar-primary/60"
+                  )}
+                >
+                  <Icon className={cn(
+                    "transition-colors duration-300 flex-shrink-0 w-5 h-5",
+                    isActive ? "text-sidebar-primary-foreground" : "text-sidebar-accent-foreground group-hover:text-sidebar-primary-foreground"
+                  )} />
+                  {isExpanded && (
+                    <div className="ml-3 overflow-hidden min-h-[2.25rem] flex flex-col justify-center">
+                      <div className={cn(
+                        "font-medium text-sm whitespace-nowrap transition-colors duration-300",
+                        isActive ? "text-sidebar-primary-foreground" : "text-sidebar-accent-foreground group-hover:text-sidebar-primary-foreground"
+                      )}>
+                        {item.name}
+                      </div>
+                    </div>
+                  )}
+                  {isActive && !isExpanded && (
+                    <>
+                      <div className="absolute inset-0 rounded-full bg-sidebar-primary opacity-20 animate-pulse" />
+                      <div className="absolute -right-2 top-1/2 -translate-y-1/2 w-1 h-6 bg-sidebar-primary rounded-l-full" />
+                    </>
+                  )}
+                  {isActive && isExpanded && (
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 w-2 h-2 bg-sidebar-primary-foreground rounded-full animate-pulse" />
+                  )}
+                </button>
+                {!isExpanded && (
+                  <div className="absolute left-full ml-4 px-3 py-2 bg-gradient-to-br from-sidebar-primary to-sidebar-primary/90 text-sidebar-primary-foreground rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-50 shadow-lg transform translate-x-2 group-hover:translate-x-0">
+                    <div className="font-medium text-sm">{item.name}</div>
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-sidebar-primary rotate-45" />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className="ml-6 my-6">
@@ -264,141 +339,33 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
             })}
           </div>
 
-          {/* Divider above Configuration */}
-          <div className="mt-4 mb-3 flex-shrink-0 px-4" aria-hidden>
-            <div
-              className="w-full"
-              style={{ height: 1, background: 'rgba(0,0,0,0.2)' }}
-            />
-          </div>
-
-          {/* Configuration Section */}
-          <div>
-            <button
-              className={cn(
-                "transition-all duration-300 flex items-center relative overflow-hidden",
-                "hover:scale-110",
-                isExpanded 
-                  ? "w-full px-4 py-3 justify-start rounded-xl min-h-[2.75rem]" 
-                  : "w-12 h-12 justify-center mx-auto rounded-full",
-                isConfigExpanded
-                  ? "bg-gradient-to-br from-sidebar-primary to-sidebar-primary/80 shadow-lg shadow-sidebar-primary/30 scale-105"
-                  : "bg-gradient-to-br from-sidebar-accent to-sidebar-accent/80 hover:from-sidebar-primary/80 hover:to-sidebar-primary/60"
-              )}
-              onClick={() => setIsConfigExpanded(!isConfigExpanded)}
-            >
-              <Settings className={cn(
-                "transition-colors duration-300 flex-shrink-0",
-                "w-5 h-5",
-                isConfigExpanded
-                  ? "text-sidebar-primary-foreground" 
-                  : "text-sidebar-accent-foreground group-hover:text-sidebar-primary-foreground"
-              )} />
-              
-              {isExpanded && (
-                <div className="ml-3 overflow-hidden min-h-[2.25rem] flex flex-col justify-center items-start text-left">
-                  <div className={cn(
-                    "font-medium text-sm whitespace-nowrap transition-colors duration-300",
-                    isConfigExpanded
-                      ? "text-sidebar-primary-foreground" 
-                      : "text-sidebar-accent-foreground group-hover:text-sidebar-primary-foreground"
-                  )}>
-                    Configuration
-                  </div>
-                  <div className={cn(
-                    "text-xs mt-0.5 whitespace-nowrap transition-colors duration-300",
-                    isConfigExpanded ? "text-sidebar-primary-foreground" : "text-white opacity-50 group-hover:text-sidebar-primary-foreground group-hover:opacity-100"
-                  )}>
-                    System settings and tools
-                  </div>
-                </div>
-              )}
-              
-              {/* Active indicator */}
-              {isConfigExpanded && !isExpanded && (
-                <>
-                  <div className="absolute inset-0 rounded-full bg-sidebar-primary opacity-20 animate-pulse" />
-                  <div className="absolute -right-2 top-1/2 -translate-y-1/2 w-1 h-6 bg-sidebar-primary rounded-l-full" />
-                </>
-              )}
-              
-              {/* Active indicator for expanded state */}
-              {isConfigExpanded && isExpanded && (
-                <div className="absolute right-2 top-1/2 -translate-y-1/2 w-2 h-2 bg-sidebar-primary-foreground rounded-full animate-pulse" />
-              )}
-            </button>
-
-            {/* Configuration Items */}
-            {isConfigExpanded && (
-              <div className="mt-2 space-y-2">
-                {configurationItems.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = currentPage === item.id;
-                  
-                  return (
-                    <div key={item.id} className="relative group">
-                      <button
-                        onClick={() => handleNavigationClick(item.id)}
-                        className={cn(
-                          "transition-all duration-300 flex items-center relative overflow-hidden",
-                          "hover:scale-110",
-                          isExpanded 
-                            ? "w-full px-4 py-3 justify-start rounded-xl min-h-[2.75rem]" 
-                            : "w-12 h-12 justify-center mx-auto rounded-full",
-                          isActive
-                            ? "bg-gradient-to-br from-sidebar-primary to-sidebar-primary/80 shadow-lg shadow-sidebar-primary/30 scale-105"
-                            : "bg-gradient-to-br from-sidebar-accent to-sidebar-accent/80 hover:from-sidebar-primary/80 hover:to-sidebar-primary/60"
-                        )}
-                      >
-                        <Icon className={cn(
-                          "transition-colors duration-300 flex-shrink-0",
-                          "w-5 h-5",
-                          isActive 
-                            ? "text-sidebar-primary-foreground" 
-                            : "text-sidebar-accent-foreground group-hover:text-sidebar-primary-foreground"
-                        )} />
-                        
-                        {isExpanded && (
-                          <div className="ml-3 overflow-hidden min-h-[2.25rem] flex flex-col justify-center">
-                            <div className={cn(
-                              "font-medium text-sm whitespace-nowrap transition-colors duration-300",
-                              isActive 
-                                ? "text-sidebar-primary-foreground" 
-                                : "text-sidebar-accent-foreground group-hover:text-sidebar-primary-foreground"
-                            )}>
-                              {item.name}
-                            </div>
-                          </div>
-                        )}
-                        
-                        {/* Active indicator */}
-                        {isActive && !isExpanded && (
-                          <>
-                            <div className="absolute inset-0 rounded-full bg-sidebar-primary opacity-20 animate-pulse" />
-                            <div className="absolute -right-2 top-1/2 -translate-y-1/2 w-1 h-6 bg-sidebar-primary rounded-l-full" />
-                          </>
-                        )}
-                        
-                        {/* Active indicator for expanded state */}
-                        {isActive && isExpanded && (
-                          <div className="absolute right-2 top-1/2 -translate-y-1/2 w-2 h-2 bg-sidebar-primary-foreground rounded-full animate-pulse" />
-                        )}
-                      </button>
-
-                      {/* Tooltip for collapsed state */}
-                      {!isExpanded && (
-                        <div className="absolute left-full ml-4 px-3 py-2 bg-gradient-to-br from-sidebar-primary to-sidebar-primary/90 text-sidebar-primary-foreground rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-50 shadow-lg transform translate-x-2 group-hover:translate-x-0">
-                          <div className="font-medium text-sm">{item.name}</div>
-                          {/* Tooltip arrow */}
-                          <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-sidebar-primary rotate-45" />
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+          {renderSection(
+            "governance",
+            "Governance",
+            "Changesets, promotion, release",
+            FolderKanban,
+            isGovernanceExpanded,
+            setIsGovernanceExpanded,
+            governanceItems
+          )}
+          {renderSection(
+            "tools",
+            "Tools",
+            "Validator, query, feeds",
+            Wrench,
+            isToolsExpanded,
+            setIsToolsExpanded,
+            toolsItems
+          )}
+          {renderSection(
+            "administration",
+            "Administration",
+            "Users, import, cache, backup",
+            Shield,
+            isAdministrationExpanded,
+            setIsAdministrationExpanded,
+            administrationItems
+          )}
         </nav>
 
         {/* User Profile Section */}

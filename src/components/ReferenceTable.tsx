@@ -1108,6 +1108,7 @@ export function ReferenceTable() {
                     value={editFormData.BandingKey || ""}
                     onChange={(e) => setEditFormData({ ...editFormData, BandingKey: e.target.value })}
                     placeholder="Term"
+                    className="border border-gray-300"
                   />
                 </div>
 
@@ -1121,6 +1122,7 @@ export function ReferenceTable() {
                       value={editFormData.Sequence || ""}
                       onChange={(e) => setEditFormData({ ...editFormData, Sequence: Number(e.target.value) })}
                       placeholder="8"
+                      className="border border-gray-300"
                     />
                   </div>
 
@@ -1133,6 +1135,7 @@ export function ReferenceTable() {
                       value={editFormData.StartValue || ""}
                       onChange={(e) => setEditFormData({ ...editFormData, StartValue: Number(e.target.value) })}
                       placeholder="18"
+                      className="border border-gray-300"
                     />
                   </div>
                 </div>
@@ -1147,6 +1150,7 @@ export function ReferenceTable() {
                       value={editFormData.EndValue || ""}
                       onChange={(e) => setEditFormData({ ...editFormData, EndValue: Number(e.target.value) })}
                       placeholder="24"
+                      className="border border-gray-300"
                     />
                   </div>
 
@@ -1158,6 +1162,7 @@ export function ReferenceTable() {
                       value={editFormData.Label || ""}
                       onChange={(e) => setEditFormData({ ...editFormData, Label: e.target.value })}
                       placeholder="<=1Y & <=2Y"
+                      className="border border-gray-300"
                     />
                   </div>
                 </div>
