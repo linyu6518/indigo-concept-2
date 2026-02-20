@@ -217,7 +217,7 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
                     )} />
                     
                     {isExpanded && (
-                      <div className="ml-3 overflow-hidden min-h-[2.25rem] flex flex-col justify-center">
+                      <div className="ml-3 overflow-hidden min-h-[2.25rem] flex flex-col justify-center items-start text-left">
                         <div className={cn(
                           "font-medium text-sm whitespace-nowrap transition-colors duration-300",
                           isActive 
@@ -226,6 +226,14 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
                         )}>
                           {item.name}
                         </div>
+                        {item.id === "dashboard" && (
+                          <div className={cn(
+                            "text-xs mt-0.5 whitespace-nowrap transition-colors duration-300",
+                            isActive ? "text-sidebar-primary-foreground" : "text-white opacity-50 group-hover:text-sidebar-primary-foreground group-hover:opacity-100"
+                          )}>
+                            {item.description}
+                          </div>
+                        )}
                       </div>
                     )}
                     
@@ -256,8 +264,16 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
             })}
           </div>
 
+          {/* Divider above Configuration */}
+          <div className="mt-4 mb-3 flex-shrink-0 px-4" aria-hidden>
+            <div
+              className="w-full"
+              style={{ height: 1, background: 'rgba(0,0,0,0.2)' }}
+            />
+          </div>
+
           {/* Configuration Section */}
-          <div className="mt-4">
+          <div>
             <button
               className={cn(
                 "transition-all duration-300 flex items-center relative overflow-hidden",
@@ -280,7 +296,7 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
               )} />
               
               {isExpanded && (
-                <div className="ml-3 overflow-hidden min-h-[2.25rem] flex flex-col justify-center">
+                <div className="ml-3 overflow-hidden min-h-[2.25rem] flex flex-col justify-center items-start text-left">
                   <div className={cn(
                     "font-medium text-sm whitespace-nowrap transition-colors duration-300",
                     isConfigExpanded
@@ -288,6 +304,12 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
                       : "text-sidebar-accent-foreground group-hover:text-sidebar-primary-foreground"
                   )}>
                     Configuration
+                  </div>
+                  <div className={cn(
+                    "text-xs mt-0.5 whitespace-nowrap transition-colors duration-300",
+                    isConfigExpanded ? "text-sidebar-primary-foreground" : "text-white opacity-50 group-hover:text-sidebar-primary-foreground group-hover:opacity-100"
+                  )}>
+                    System settings and tools
                   </div>
                 </div>
               )}
