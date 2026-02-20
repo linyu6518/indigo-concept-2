@@ -339,7 +339,7 @@ export function DataCatalog() {
   });
 
   return (
-    <div className="min-h-screen flex" style={{ backgroundColor: '#f8faf9' }}>
+    <div className="min-h-screen flex">
       {/* Model Explorer Sidebar */}
       <div className="w-80 flex flex-col pt-6 border-r border-gray-200">
         <div className="px-4 pb-4 border-b border-gray-200">

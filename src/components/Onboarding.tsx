@@ -301,7 +301,7 @@ export function Onboarding() {
   // Feed List View (Level 1)
   if (!selectedFeed) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: '#f8faf9' }}>
+      <div className="min-h-screen">
         <div className="p-6 space-y-6">
           {/* Header with Search */}
           <div className="flex items-start justify-between gap-6">
@@ -484,7 +484,7 @@ export function Onboarding() {
   // RuleGroup List View (Level 2)
   if (selectedFeed && !selectedRuleGroup) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: '#f8faf9' }}>
+      <div className="min-h-screen">
         <div className="p-6 space-y-6">
           {/* Header */}
           <div className="flex items-start justify-between gap-6">
@@ -752,7 +752,7 @@ export function Onboarding() {
 
   // Sequence List View (Level 3)
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f8faf9' }}>
+    <div className="min-h-screen">
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-start justify-between gap-6">

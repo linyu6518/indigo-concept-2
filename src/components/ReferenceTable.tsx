@@ -284,7 +284,7 @@ export function ReferenceTable() {
   // Main list view - Landing Page
   if (!selectedTable) {
     return (
-      <div className="flex-1 p-6" style={{ backgroundColor: '#f8faf9' }}>
+      <div className="flex-1 p-6">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -542,7 +542,7 @@ export function ReferenceTable() {
   const selectedTableData = allTables.find(t => t.id === selectedTable);
 
   return (
-    <div className="flex-1 flex flex-col" style={{ backgroundColor: '#f8faf9' }}>
+    <div className="flex-1 flex flex-col">
       {/* Header */}
       <div className="p-6 pb-4">
         <div className="flex justify-between items-center">

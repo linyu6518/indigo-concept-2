@@ -17,8 +17,7 @@ import {
   Archive,
   FolderKanban,
   Settings,
-  ChevronDown,
-  X
+  ChevronDown
 } from "lucide-react";
 
 interface SidebarProps {
@@ -153,18 +152,11 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
         onMouseLeave={handleMouseLeave}
       >
         {/* Header with Logo */}
-        <div className="p-6 flex flex-col items-center relative">
-          {/* Close button when expanded */}
-          {isExpanded && (
-            <button
-              onClick={() => setIsExpanded(false)}
-              className="absolute top-4 right-4 w-8 h-8 bg-sidebar-accent/50 hover:bg-sidebar-accent rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110"
-            >
-              <X className="w-4 h-4 text-sidebar-foreground" />
-            </button>
-          )}
-          
-          <div className="w-12 h-12 rounded-lg flex items-center justify-center shadow-lg overflow-hidden">
+        <div className={cn(
+          "p-4 flex flex-row items-center justify-start relative",
+          isExpanded && "gap-3"
+        )}>
+          <div className="w-12 h-12 flex-shrink-0 rounded-lg flex items-center justify-center shadow-lg overflow-hidden">
             <svg width="100%" height="100%" viewBox="0 0 400 358" fill="none" xmlns="http://www.w3.org/2000/svg">
               <g clipPath="url(#clip0_13001_2)">
                 <path d="M0 357.728H400V-1.33514e-05H0V357.728Z" fill="#54B948"/>
@@ -183,11 +175,11 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
             </svg>
           </div>
           {isExpanded && (
-            <div className="mt-3 text-center">
+            <div className="flex flex-col items-start min-w-0">
               <h2 className="text-sidebar-foreground font-semibold text-base whitespace-nowrap">
                 TBSM Indigo
               </h2>
-              <p className="text-sidebar-foreground/70 text-xs whitespace-nowrap mt-1">
+              <p className="text-sidebar-foreground/70 text-xs whitespace-nowrap mt-0.5">
                 Document Management
               </p>
             </div>
@@ -207,9 +199,9 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
                     onClick={() => handleNavigationClick(item.id)}
                     className={cn(
                       "transition-all duration-300 flex items-center relative overflow-hidden",
-                      "hover:scale-110 hover:shadow-lg",
+                      "hover:scale-110",
                       isExpanded 
-                        ? "w-full px-4 py-3 justify-start rounded-xl" 
+                        ? "w-full px-4 py-3 justify-start rounded-xl min-h-[2.75rem]" 
                         : "w-12 h-12 justify-center mx-auto rounded-full",
                       isActive
                         ? "bg-gradient-to-br from-sidebar-primary to-sidebar-primary/80 shadow-lg shadow-sidebar-primary/30 scale-105"
@@ -225,7 +217,7 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
                     )} />
                     
                     {isExpanded && (
-                      <div className="ml-3 overflow-hidden">
+                      <div className="ml-3 overflow-hidden min-h-[2.25rem] flex flex-col justify-center">
                         <div className={cn(
                           "font-medium text-sm whitespace-nowrap transition-colors duration-300",
                           isActive 
@@ -234,11 +226,6 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
                         )}>
                           {item.name}
                         </div>
-                        {isActive && (
-                          <div className="text-xs text-sidebar-primary-foreground/70 mt-0.5 whitespace-nowrap">
-                            {item.description}
-                          </div>
-                        )}
                       </div>
                     )}
                     
@@ -260,7 +247,6 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
                   {!isExpanded && (
                     <div className="absolute left-full ml-4 px-3 py-2 bg-gradient-to-br from-sidebar-primary to-sidebar-primary/90 text-sidebar-primary-foreground rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-50 shadow-lg transform translate-x-2 group-hover:translate-x-0">
                       <div className="font-medium text-sm">{item.name}</div>
-                      <div className="text-xs opacity-75 mt-1">{item.description}</div>
                       {/* Tooltip arrow */}
                       <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-sidebar-primary rotate-45" />
                     </div>
@@ -275,9 +261,9 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
             <button
               className={cn(
                 "transition-all duration-300 flex items-center relative overflow-hidden",
-                "hover:scale-110 hover:shadow-lg",
+                "hover:scale-110",
                 isExpanded 
-                  ? "w-full px-4 py-3 justify-start rounded-xl" 
+                  ? "w-full px-4 py-3 justify-start rounded-xl min-h-[2.75rem]" 
                   : "w-12 h-12 justify-center mx-auto rounded-full",
                 isConfigExpanded
                   ? "bg-gradient-to-br from-sidebar-primary to-sidebar-primary/80 shadow-lg shadow-sidebar-primary/30 scale-105"
@@ -294,7 +280,7 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
               )} />
               
               {isExpanded && (
-                <div className="ml-3 overflow-hidden">
+                <div className="ml-3 overflow-hidden min-h-[2.25rem] flex flex-col justify-center">
                   <div className={cn(
                     "font-medium text-sm whitespace-nowrap transition-colors duration-300",
                     isConfigExpanded
@@ -333,9 +319,9 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
                         onClick={() => handleNavigationClick(item.id)}
                         className={cn(
                           "transition-all duration-300 flex items-center relative overflow-hidden",
-                          "hover:scale-110 hover:shadow-lg",
+                          "hover:scale-110",
                           isExpanded 
-                            ? "w-full px-4 py-3 justify-start rounded-xl" 
+                            ? "w-full px-4 py-3 justify-start rounded-xl min-h-[2.75rem]" 
                             : "w-12 h-12 justify-center mx-auto rounded-full",
                           isActive
                             ? "bg-gradient-to-br from-sidebar-primary to-sidebar-primary/80 shadow-lg shadow-sidebar-primary/30 scale-105"
@@ -351,7 +337,7 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
                         )} />
                         
                         {isExpanded && (
-                          <div className="ml-3 overflow-hidden">
+                          <div className="ml-3 overflow-hidden min-h-[2.25rem] flex flex-col justify-center">
                             <div className={cn(
                               "font-medium text-sm whitespace-nowrap transition-colors duration-300",
                               isActive 
@@ -360,11 +346,6 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
                             )}>
                               {item.name}
                             </div>
-                            {isActive && (
-                              <div className="text-xs text-sidebar-primary-foreground/70 mt-0.5 whitespace-nowrap">
-                                {item.description}
-                              </div>
-                            )}
                           </div>
                         )}
                         
@@ -386,7 +367,6 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
                       {!isExpanded && (
                         <div className="absolute left-full ml-4 px-3 py-2 bg-gradient-to-br from-sidebar-primary to-sidebar-primary/90 text-sidebar-primary-foreground rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-50 shadow-lg transform translate-x-2 group-hover:translate-x-0">
                           <div className="font-medium text-sm">{item.name}</div>
-                          <div className="text-xs opacity-75 mt-1">{item.description}</div>
                           {/* Tooltip arrow */}
                           <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-sidebar-primary rotate-45" />
                         </div>

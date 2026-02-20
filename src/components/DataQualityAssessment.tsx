@@ -203,7 +203,7 @@ export function DataQualityAssessment() {
   // Main dashboard - Stages view
   if (!selectedStage) {
     return (
-      <div className="flex-1 p-6" style={{ backgroundColor: '#f8faf9' }}>
+      <div className="flex-1 p-6">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -348,7 +348,7 @@ export function DataQualityAssessment() {
     const stageRuleGroups = mockRuleGroups.filter(rg => rg.stage === currentStage?.name);
 
     return (
-      <div className="flex-1 p-6" style={{ backgroundColor: '#f8faf9' }}>
+      <div className="flex-1 p-6">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -448,7 +448,7 @@ export function DataQualityAssessment() {
   const currentStage = mockStages.find(s => s.name === currentRuleGroup?.stage);
 
   return (
-    <div className="flex-1 flex flex-col" style={{ backgroundColor: '#f8faf9' }}>
+    <div className="flex-1 flex flex-col">
       {/* Header */}
       <div className="p-6 pb-4">
         <div className="flex justify-between items-center">
