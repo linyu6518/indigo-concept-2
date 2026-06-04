@@ -252,3 +252,40 @@ html {
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask-composite: exclude;
 }
+
+/* Privacy demo – sensitive name redaction */
+.sensitive-blur {
+  display: inline-block;
+  max-width: 100%;
+  user-select: none;
+  -webkit-user-select: none;
+  color: transparent !important;
+  text-shadow: 0 0 10px rgba(55, 65, 81, 0.95);
+  filter: blur(6px);
+}
+
+.sensitive-blur-block {
+  display: block;
+  max-width: 100%;
+  user-select: none;
+  -webkit-user-select: none;
+  color: transparent !important;
+  text-shadow: 0 0 10px rgba(55, 65, 81, 0.95);
+  filter: blur(6px);
+}
+
+.sensitive-blur-input {
+  user-select: none;
+  -webkit-user-select: none;
+  color: transparent !important;
+  text-shadow: 0 0 8px rgba(55, 65, 81, 0.9);
+  filter: blur(5px);
+}
+
+.sensitive-blur-avatar {
+  user-select: none;
+  -webkit-user-select: none;
+  color: transparent !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.95);
+  filter: blur(5px);
+}

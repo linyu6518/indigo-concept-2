@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { DAGView } from "./DAGView";
+import { SensitiveText, sensitiveInputBlurClass } from "./SensitiveText";
 import { 
   Search, 
   List, 
@@ -844,7 +845,7 @@ export function Onboarding() {
               <Database className="w-5 h-5 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-sm text-foreground truncate">{feedData.feed}</h3>
+              <h3 className="font-semibold text-sm text-foreground truncate"><SensitiveText>{feedData.feed}</SensitiveText></h3>
               <div className="flex items-center gap-2 mt-1">
                 <Badge variant="outline" className={`text-xs ${getStatusColor(feedData.status)}`}>
                   {feedData.status}
@@ -1146,7 +1147,7 @@ export function Onboarding() {
                               <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
                                 <FileCode className="w-4 h-4 text-primary" />
                               </div>
-                              <span className="text-sm font-medium text-foreground">{feed.feed}</span>
+                              <span className="text-sm font-medium text-foreground"><SensitiveText>{feed.feed}</SensitiveText></span>
                             </div>
                           </td>
 
@@ -1275,7 +1276,7 @@ export function Onboarding() {
                 Onboarding
               </button>
               <span className="text-2xl font-semibold text-muted-foreground">&gt;</span>
-              <h1 className="text-2xl font-semibold text-foreground">{selectedFeed}</h1>
+              <h1 className="text-2xl font-semibold text-foreground"><SensitiveText>{selectedFeed}</SensitiveText></h1>
             </div>
 
             <div className="flex items-center gap-3">
@@ -1363,9 +1364,9 @@ export function Onboarding() {
                       {change.status}
                     </Badge>
                     <div className="text-sm text-foreground">
-                      <span className="font-medium">{change.user}</span> submitted version <span className="font-medium">{change.versionId}</span> on {change.submittedDate}
+                      <span className="font-medium"><SensitiveText>{change.user}</SensitiveText></span> submitted version <span className="font-medium">{change.versionId}</span> on {change.submittedDate}
                       {change.jira && (
-                        <span className="ml-2 text-sm text-muted-foreground">({change.jira})</span>
+                        <span className="ml-2 text-sm text-muted-foreground">(<SensitiveText>{change.jira}</SensitiveText>)</span>
                       )}
                     </div>
                   </div>
@@ -1422,10 +1423,10 @@ export function Onboarding() {
                           <Checkbox />
                         </td>
                         <td className="px-4 py-4 text-sm font-medium text-foreground">
-                          {rg.rulegroup}
+                          <SensitiveText>{rg.rulegroup}</SensitiveText>
                         </td>
                         <td className="px-4 py-4 text-sm text-foreground">{rg.sequence}</td>
-                        <td className="px-4 py-4 text-sm text-muted-foreground">{rg.description}</td>
+                        <td className="px-4 py-4 text-sm text-muted-foreground"><SensitiveText>{rg.description}</SensitiveText></td>
                         <td className="px-4 py-4">
                           <button
                             onClick={() => handleRuleGroupClick(rg)}
@@ -1436,7 +1437,7 @@ export function Onboarding() {
                           </button>
                         </td>
                         <td className="px-4 py-4 text-sm text-foreground">{rg.outputViewFlag ? "true" : "false"}</td>
-                        <td className="px-4 py-4 text-sm text-foreground">{rg.outputViewName || "-"}</td>
+                        <td className="px-4 py-4 text-sm text-foreground"><SensitiveText>{rg.outputViewName || "-"}</SensitiveText></td>
                         <td className="px-4 py-4">
                           <div className="flex items-center gap-2">
                             <button className="text-muted-foreground hover:text-[#5BBD72] transition-colors">
@@ -1488,7 +1489,7 @@ export function Onboarding() {
                   <Input
                     value={editRuleGroupForm.rulegroup}
                     onChange={(e) => setEditRuleGroupForm({...editRuleGroupForm, rulegroup: e.target.value})}
-                    className="bg-white"
+                    className={`bg-white ${sensitiveInputBlurClass}`}
                   />
                 </div>
                 <div>
@@ -1504,7 +1505,7 @@ export function Onboarding() {
                   <Input
                     value={editRuleGroupForm.description}
                     onChange={(e) => setEditRuleGroupForm({...editRuleGroupForm, description: e.target.value})}
-                    className="bg-white"
+                    className={`bg-white ${sensitiveInputBlurClass}`}
                     placeholder="description"
                   />
                 </div>
@@ -1515,7 +1516,7 @@ export function Onboarding() {
                 <Input
                   value={editRuleGroupForm.outputViewName}
                   onChange={(e) => setEditRuleGroupForm({...editRuleGroupForm, outputViewName: e.target.value})}
-                  className="bg-white"
+                  className={`bg-white ${sensitiveInputBlurClass}`}
                   placeholder="outputViewName"
                 />
               </div>
@@ -1574,10 +1575,10 @@ export function Onboarding() {
               onClick={handleBackToRuleGroups}
               className="text-2xl font-semibold text-muted-foreground hover:text-foreground transition-colors"
             >
-              {selectedFeed}
+              <SensitiveText>{selectedFeed}</SensitiveText>
             </button>
             <span className="text-2xl font-semibold text-muted-foreground">&gt;</span>
-            <h1 className="text-2xl font-semibold text-foreground">{selectedRuleGroup?.rulegroup}</h1>
+            <h1 className="text-2xl font-semibold text-foreground"><SensitiveText>{selectedRuleGroup?.rulegroup}</SensitiveText></h1>
           </div>
 
           <div className="flex items-center gap-3">
@@ -1742,9 +1743,9 @@ export function Onboarding() {
                     {change.status}
                   </Badge>
                   <div className="text-sm text-foreground">
-                    <span className="font-medium">{change.user}</span> submitted version <span className="font-medium">{change.versionId}</span> on {change.submittedDate}
+                    <span className="font-medium"><SensitiveText>{change.user}</SensitiveText></span> submitted version <span className="font-medium">{change.versionId}</span> on {change.submittedDate}
                     {change.jira && (
-                      <span className="ml-2 text-sm text-muted-foreground">({change.jira})</span>
+                      <span className="ml-2 text-sm text-muted-foreground">(<SensitiveText>{change.jira}</SensitiveText>)</span>
                     )}
                   </div>
                 </div>
@@ -1817,7 +1818,7 @@ export function Onboarding() {
                       <td className="px-4 py-4 text-sm text-foreground">{rule.sequence}</td>
                     )}
                     {visibleColumns.attributeName && (
-                      <td className="px-4 py-4 text-sm text-foreground">{rule.attributeName || "-"}</td>
+                      <td className="px-4 py-4 text-sm text-foreground"><SensitiveText>{rule.attributeName || "-"}</SensitiveText></td>
                     )}
                     {visibleColumns.type && (
                       <td className="px-4 py-4">
@@ -1828,11 +1829,11 @@ export function Onboarding() {
                     )}
                     {visibleColumns.value && (
                       <td className="px-4 py-4 text-sm text-foreground max-w-md">
-                        <div className="truncate">{rule.value}</div>
+                        <div className="truncate"><SensitiveText>{rule.value}</SensitiveText></div>
                       </td>
                     )}
                     {visibleColumns.description && (
-                      <td className="px-4 py-4 text-sm text-muted-foreground">{rule.description || "-"}</td>
+                      <td className="px-4 py-4 text-sm text-muted-foreground"><SensitiveText>{rule.description || "-"}</SensitiveText></td>
                     )}
                     {visibleColumns.outputfile && (
                       <td className="px-4 py-4 text-sm text-foreground">{rule.outputfile ? "true" : "false"}</td>
@@ -1942,7 +1943,7 @@ export function Onboarding() {
                 <Input
                   value={editingRuleData.attributeName}
                   onChange={(e) => setEditingRuleData({...editingRuleData, attributeName: e.target.value})}
-                  className="bg-white"
+                  className={`bg-white ${sensitiveInputBlurClass}`}
                   placeholder="attributeName"
                 />
               </div>
@@ -2045,7 +2046,7 @@ export function Onboarding() {
                           }
                         }}
                         placeholder="Enter SQL query or expression..."
-                        className="w-full border-none outline-none resize-y font-mono text-sm leading-relaxed p-4 placeholder:text-slate-500"
+                        className={`w-full border-none outline-none resize-y font-mono text-sm leading-relaxed p-4 placeholder:text-slate-500 ${sensitiveInputBlurClass}`}
                         rows={12}
                         style={{
                           minHeight: "280px",
@@ -2106,7 +2107,7 @@ export function Onboarding() {
                             {editingRule?.impactedFields?.map((field, idx) => (
                               <div key={idx} className="flex items-center gap-2 text-xs">
                                 <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                                <span className="text-foreground font-mono">{field}</span>
+                                <span className="text-foreground font-mono"><SensitiveText>{field}</SensitiveText></span>
                               </div>
                             )) || (
                               <div className="text-xs text-muted-foreground italic">No fields detected</div>
@@ -2354,7 +2355,7 @@ export function Onboarding() {
               <div>
                 <h2 className="text-xl font-semibold">Impact Preview</h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Rule: {selectedRuleForImpact.attributeName || `Sequence ${selectedRuleForImpact.sequence}`}
+                  Rule: <SensitiveText>{selectedRuleForImpact.attributeName || `Sequence ${selectedRuleForImpact.sequence}`}</SensitiveText>
                 </p>
               </div>
               <button onClick={() => setShowImpactPreview(false)}>
@@ -2399,7 +2400,7 @@ export function Onboarding() {
               <div className="flex flex-wrap gap-2">
                 {selectedRuleForImpact.impactedFields?.map((field, idx) => (
                   <Badge key={idx} variant="outline" className="bg-blue-50 border-blue-200 text-blue-700">
-                    {field}
+                    <SensitiveText>{field}</SensitiveText>
                   </Badge>
                 ))}
               </div>
@@ -2414,7 +2415,7 @@ export function Onboarding() {
                 </div>
                 <div>
                   <span className="text-muted-foreground">Modified By:</span>
-                  <span className="ml-2 font-medium">{selectedRuleForImpact.modifiedBy}</span>
+                  <span className="ml-2 font-medium"><SensitiveText>{selectedRuleForImpact.modifiedBy}</SensitiveText></span>
                 </div>
               </div>
             </div>
@@ -2430,7 +2431,7 @@ export function Onboarding() {
               <div>
                 <h2 className="text-xl font-semibold">Field Lineage</h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Data flow for {selectedRuleForLineage.attributeName || `Sequence ${selectedRuleForLineage.sequence}`}
+                  Data flow for <SensitiveText>{selectedRuleForLineage.attributeName || `Sequence ${selectedRuleForLineage.sequence}`}</SensitiveText>
                 </p>
               </div>
               <button onClick={() => setShowFieldLineage(false)}>
@@ -2446,7 +2447,7 @@ export function Onboarding() {
                     {/* Source */}
                     <div className="flex-1">
                       <div className="text-xs text-muted-foreground mb-1">Source Field</div>
-                      <Badge className="bg-gray-700 text-white">{field}</Badge>
+                      <Badge className="bg-gray-700 text-white"><SensitiveText>{field}</SensitiveText></Badge>
                     </div>
                     
                     {/* Arrow */}
@@ -2467,7 +2468,7 @@ export function Onboarding() {
                     <div className="flex-1">
                       <div className="text-xs text-muted-foreground mb-1">Target Field</div>
                       <Badge className="bg-[#5BBD72] text-white">
-                        {selectedRuleForLineage.attributeName || field}
+                        <SensitiveText>{selectedRuleForLineage.attributeName || field}</SensitiveText>
                       </Badge>
                     </div>
                   </div>

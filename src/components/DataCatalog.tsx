@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { extendedMockFields } from "./DataCatalogExtendedFields";
+import { SensitiveText } from "./SensitiveText";
 import { LineageDAGView } from "./LineageDAGView";
 import { 
   Search, 
@@ -608,7 +609,7 @@ export function DataCatalog() {
                           )}
                         >
                           <Box className="w-3.5 h-3.5 flex-shrink-0" />
-                          <span className="text-sm flex-1">{entity.name}</span>
+                          <span className="text-sm flex-1"><SensitiveText>{entity.name}</SensitiveText></span>
                           <Badge 
                             variant="outline" 
                             className={cn(
@@ -639,7 +640,13 @@ export function DataCatalog() {
           <div className="flex items-start justify-between gap-6 mb-4">
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-semibold text-foreground">
-                {selectedField ? `Field: ${selectedField.fieldName}` : `Entity: ${selectedEntity?.name || "Data Catalog"}`}
+                {selectedField ? (
+                  <>Field: <SensitiveText>{selectedField.fieldName}</SensitiveText></>
+                ) : selectedEntity ? (
+                  <>Entity: <SensitiveText>{selectedEntity.name}</SensitiveText></>
+                ) : (
+                  "Data Catalog"
+                )}
               </h1>
               {selectedEntity && !selectedField && (
                 <div className="flex items-center gap-2">
@@ -687,7 +694,7 @@ export function DataCatalog() {
               onClick={() => setSelectedField(null)}
               className="gap-2"
             >
-              ← Back to {selectedEntity?.name}
+              ← Back to <SensitiveText>{selectedEntity?.name}</SensitiveText>
             </Button>
 
             {/* Section 1: Field Definition */}
@@ -705,7 +712,7 @@ export function DataCatalog() {
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label className="text-xs text-muted-foreground">Name</label>
-                  <div className="text-sm font-medium text-foreground mt-1">{selectedField.fieldName}</div>
+                  <div className="text-sm font-medium text-foreground mt-1"><SensitiveText>{selectedField.fieldName}</SensitiveText></div>
                 </div>
                 <div>
                   <label className="text-xs text-muted-foreground">Type</label>
@@ -715,20 +722,20 @@ export function DataCatalog() {
                   <label className="text-xs text-muted-foreground">Owner</label>
                   <div className="text-sm text-foreground mt-1 flex items-center gap-1">
                     <Users className="w-3 h-3 text-muted-foreground" />
-                    {selectedField.owner}
+                    <SensitiveText>{selectedField.owner}</SensitiveText>
                   </div>
                 </div>
                 <div>
                   <label className="text-xs text-muted-foreground">Steward</label>
                   <div className="text-sm text-foreground mt-1 flex items-center gap-1">
                     <Shield className="w-3 h-3 text-muted-foreground" />
-                    {selectedField.steward}
+                    <SensitiveText>{selectedField.steward}</SensitiveText>
                   </div>
                 </div>
                 <div>
                   <label className="text-xs text-muted-foreground">Sample Value</label>
                   <div className="text-sm text-foreground mt-1 font-mono bg-gray-50 px-2 py-1 rounded">
-                    {selectedField.sampleData}
+                    <SensitiveText>{selectedField.sampleData}</SensitiveText>
                   </div>
                 </div>
                 <div>
@@ -746,12 +753,12 @@ export function DataCatalog() {
                 </div>
                 <div className="col-span-3">
                   <label className="text-xs text-muted-foreground">Technical Description</label>
-                  <div className="text-sm text-foreground mt-1">{selectedField.description}</div>
+                  <div className="text-sm text-foreground mt-1"><SensitiveText>{selectedField.description}</SensitiveText></div>
                 </div>
                 <div className="col-span-3">
                   <label className="text-xs text-muted-foreground">Business Description</label>
                   <div className="text-sm text-foreground mt-1 bg-blue-50 p-3 rounded-lg border border-blue-100">
-                    {selectedField.businessDescription}
+                    <SensitiveText>{selectedField.businessDescription}</SensitiveText>
                   </div>
                 </div>
               </div>
@@ -869,7 +876,7 @@ export function DataCatalog() {
                           >
                             {dep.type.toUpperCase()}
                           </Badge>
-                          <span className="text-sm font-medium text-foreground">{dep.name}</span>
+                          <span className="text-sm font-medium text-foreground"><SensitiveText>{dep.name}</SensitiveText></span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge 
@@ -937,7 +944,7 @@ export function DataCatalog() {
                           </div>
                           <div className="flex items-center gap-1">
                             <Users className="w-3 h-3" />
-                            {release.author}
+                            <SensitiveText>{release.author}</SensitiveText>
                           </div>
                         </div>
                       </div>
@@ -1214,7 +1221,7 @@ export function DataCatalog() {
                           <div className="flex items-center gap-2">
                             <Box className="w-4 h-4 text-primary" />
                             <span className="text-sm font-medium text-foreground">
-                              {field.fieldName}
+                              <SensitiveText>{field.fieldName}</SensitiveText>
                             </span>
                             {field.primaryKey === "Y" && (
                               <Badge variant="outline" className="text-xs border-blue-200 text-blue-700 bg-blue-50">
@@ -1298,7 +1305,7 @@ export function DataCatalog() {
                 <div>
                   <h3 className="font-semibold text-lg text-foreground">Impact Simulation</h3>
                   <p className="text-sm text-muted-foreground">
-                    Analyzing changes to <span className="font-mono text-foreground">{selectedField.fieldName}</span>
+                    Analyzing changes to <span className="font-mono text-foreground"><SensitiveText>{selectedField.fieldName}</SensitiveText></span>
                   </p>
                 </div>
               </div>
@@ -1376,7 +1383,7 @@ export function DataCatalog() {
                           <AlertTriangle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
                           <div>
                             <div className="text-sm font-medium text-red-900">
-                              {dep.type === "rule" ? "Rule" : "DQ"}: {dep.name}
+                              {dep.type === "rule" ? "Rule" : "DQ"}: <SensitiveText>{dep.name}</SensitiveText>
                             </div>
                             <div className="text-xs text-red-700 mt-1">
                               Type mismatch in validation logic - requires update

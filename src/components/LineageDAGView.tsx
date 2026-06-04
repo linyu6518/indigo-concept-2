@@ -11,6 +11,7 @@ import {
   ArrowRight
 } from "lucide-react";
 import { cn } from "./ui/utils";
+import { SensitiveText } from "./SensitiveText";
 
 interface LineageNode {
   stage: string;
@@ -143,7 +144,7 @@ export function LineageDAGView({ lineage }: LineageDAGViewProps) {
                         "text-sm font-bold leading-tight line-clamp-2",
                         colors.text
                       )}>
-                        {node.name}
+                        <SensitiveText className={colors.text}>{node.name}</SensitiveText>
                       </div>
                     </div>
                   </div>
@@ -152,7 +153,7 @@ export function LineageDAGView({ lineage }: LineageDAGViewProps) {
                   <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20">
                     <div className="bg-gray-900 text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap shadow-xl">
                       <div className="font-semibold">{node.stage}</div>
-                      <div className="text-gray-300 mt-1">{node.name}</div>
+                      <div className="text-gray-300 mt-1"><SensitiveText>{node.name}</SensitiveText></div>
                       <div className="flex items-center gap-1 mt-1">
                         <div className={cn(
                           "w-2 h-2 rounded-full",

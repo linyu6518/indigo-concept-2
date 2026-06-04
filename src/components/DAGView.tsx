@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
+import { SensitiveText } from "./SensitiveText";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { 
@@ -363,9 +364,9 @@ export function DAGView({ nodes, onNodeClick, onEditNode }: DAGViewProps) {
                 {/* Header with Sequence Badge */}
                 <div className="mb-4 flex items-start justify-between gap-3">
                   <div className="flex-1">
-                    <h3 className="font-semibold text-base text-foreground mb-1">{rg.rulegroup}</h3>
+                    <h3 className="font-semibold text-base text-foreground mb-1"><SensitiveText>{rg.rulegroup}</SensitiveText></h3>
                     {rg.description && (
-                      <p className="text-xs text-muted-foreground line-clamp-2">{rg.description}</p>
+                      <p className="text-xs text-muted-foreground line-clamp-2"><SensitiveText>{rg.description}</SensitiveText></p>
                     )}
                   </div>
                   

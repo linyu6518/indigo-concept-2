@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SensitiveText } from "./SensitiveText";
 import { 
   Search,
   Filter,
@@ -296,7 +297,7 @@ export function DataQualityAssessment() {
               className={`text-left p-6 rounded-lg border-2 transition-all hover:shadow-lg ${getStatusColor(stage.status)}`}
             >
               <div className="flex items-start justify-between mb-4">
-                <h3 className="text-lg font-semibold">{stage.name}</h3>
+                <h3 className="text-lg font-semibold"><SensitiveText>{stage.name}</SensitiveText></h3>
                 {stage.status === "critical" && <Flame className="w-5 h-5 text-red-600" />}
                 {stage.status === "warning" && <AlertTriangle className="w-5 h-5 text-orange-600" />}
                 {stage.status === "healthy" && <CheckCircle className="w-5 h-5 text-green-600" />}
@@ -403,7 +404,7 @@ export function DataQualityAssessment() {
               className="bg-white border border-gray-200 rounded-lg p-5 text-left hover:border-[#5BBD72] hover:shadow-md transition-all"
             >
               <div className="flex items-start justify-between mb-4">
-                <h3 className="font-semibold text-foreground pr-2">{ruleGroup.name}</h3>
+                <h3 className="font-semibold text-foreground pr-2"><SensitiveText>{ruleGroup.name}</SensitiveText></h3>
                 {getTrendIcon(ruleGroup.trend)}
               </div>
 
@@ -528,7 +529,7 @@ export function DataQualityAssessment() {
                         {flow.status === "warning" && <AlertCircle className="w-8 h-8 text-orange-600" />}
                       </div>
                       <div className="font-semibold text-sm text-foreground mb-1">{flow.stage}</div>
-                      <div className="text-xs text-muted-foreground mb-1">{flow.description}</div>
+                      <div className="text-xs text-muted-foreground mb-1"><SensitiveText>{flow.description}</SensitiveText></div>
                       {flow.rules > 0 && (
                         <div className="text-xs font-medium text-[#5BBD72]">{flow.rules} rules</div>
                       )}
@@ -554,7 +555,7 @@ export function DataQualityAssessment() {
                   <div key={rule.id} className="bg-white border border-gray-200 rounded-lg p-5 hover:border-[#5BBD72] transition-colors">
                     <div className="flex items-start justify-between mb-4">
                       <div>
-                        <h4 className="font-semibold text-foreground mb-1">{rule.name}</h4>
+                        <h4 className="font-semibold text-foreground mb-1"><SensitiveText>{rule.name}</SensitiveText></h4>
                         <div className="text-sm text-muted-foreground">RuleGroup: {rule.ruleGroup}</div>
                       </div>
                       <div className={`px-3 py-1 rounded-full text-xs font-medium border ${getSeverityColor(rule.severity)}`}>
@@ -676,7 +677,7 @@ export function DataQualityAssessment() {
                 ].map((item, idx) => (
                   <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex-1">
-                      <div className="font-medium text-foreground">{item.field}</div>
+                      <div className="font-medium text-foreground"><SensitiveText>{item.field}</SensitiveText></div>
                       <div className="text-sm text-muted-foreground">{item.failures.toLocaleString()} failures</div>
                     </div>
                     <div className="text-right">
@@ -709,7 +710,7 @@ export function DataQualityAssessment() {
               {mockFieldHealth.map((field, idx) => (
                 <div key={idx} className="bg-white border border-gray-200 rounded-lg p-5 hover:border-[#5BBD72] transition-all">
                   <div className="flex items-start justify-between mb-4">
-                    <h4 className="font-semibold text-foreground pr-2">{field.fieldName}</h4>
+                    <h4 className="font-semibold text-foreground pr-2"><SensitiveText>{field.fieldName}</SensitiveText></h4>
                     {getTrendIcon(field.trend)}
                   </div>
 

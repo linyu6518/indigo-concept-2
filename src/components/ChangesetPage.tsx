@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SensitiveText, sensitiveInputBlurClass, sensitiveAvatarBlurClass } from "./SensitiveText";
 import { 
   ExternalLink, 
   MessageSquare, 
@@ -683,7 +684,7 @@ export function ChangesetPage() {
                         </td>
                         <td className="px-4 py-4">
                           <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-900 font-medium">{item.jiraTicket}</span>
+                            <span className="text-sm text-gray-900 font-medium"><SensitiveText>{item.jiraTicket}</SensitiveText></span>
                             <ExternalLink className="w-3.5 h-3.5 text-gray-400 hover:text-[#5BBD72] cursor-pointer transition-colors" />
                           </div>
                         </td>
@@ -734,10 +735,10 @@ export function ChangesetPage() {
                         </td>
                         <td className="px-4 py-4">
                           <div 
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold"
+                            className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold ${sensitiveAvatarBlurClass}`}
                             style={{ backgroundColor: item.createdByColor }}
                           >
-                            {item.createdBy}
+                            <SensitiveText>{item.createdBy}</SensitiveText>
                           </div>
                         </td>
                         <td className="px-4 py-4 text-sm text-gray-700 whitespace-nowrap">{item.createOn}</td>
@@ -1083,14 +1084,14 @@ export function ChangesetPage() {
                   {item.commentList.map((comment) => (
                     <div key={comment.id} className="flex gap-3">
                       <div 
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold flex-shrink-0"
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold flex-shrink-0 ${sensitiveAvatarBlurClass}`}
                         style={{ backgroundColor: comment.userColor }}
                       >
                         {comment.user.substring(0, 2).toUpperCase()}
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-semibold text-xs text-gray-900">{comment.user}</span>
+                          <span className="font-semibold text-xs text-gray-900"><SensitiveText>{comment.user}</SensitiveText></span>
                           <span className="text-xs text-gray-500">{comment.time}</span>
                         </div>
                         <p className="text-sm text-gray-700">{comment.content}</p>
@@ -1150,7 +1151,7 @@ export function ChangesetPage() {
                     type="text"
                     value={editForm.jiraTicket}
                     onChange={(e) => setEditForm({ ...editForm, jiraTicket: e.target.value })}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5BBD72] focus:border-transparent text-sm"
+                    className={`w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5BBD72] focus:border-transparent text-sm ${sensitiveInputBlurClass}`}
                     placeholder="Enter Jira Ticket"
                   />
                 </div>

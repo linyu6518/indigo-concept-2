@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SensitiveText } from "./SensitiveText";
 import { 
   LayoutGrid, 
   List, 
@@ -376,7 +377,7 @@ export function ReferenceTable() {
                 style={{ width: "calc((100cqw - 3 * 1rem) / 3.5)" }}
               >
                 <div className="flex items-start justify-between mb-3">
-                  <h3 className="font-semibold text-foreground">{table.name}</h3>
+                  <h3 className="font-semibold text-foreground"><SensitiveText>{table.name}</SensitiveText></h3>
                   {table.pendingChanges > 0 && (
                     <span className="bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full text-xs font-medium">
                       {table.pendingChanges} Pending
@@ -444,7 +445,7 @@ export function ReferenceTable() {
                 className="bg-white border border-gray-200 rounded-lg p-5 text-left hover:border-[#5BBD72] hover:shadow-md transition-all"
               >
                 <div className="flex items-start justify-between mb-3">
-                  <h3 className="font-semibold text-foreground">{table.name}</h3>
+                  <h3 className="font-semibold text-foreground"><SensitiveText>{table.name}</SensitiveText></h3>
                   {table.pendingChanges > 0 && (
                     <span className="bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full text-xs font-medium">
                       {table.pendingChanges} Pending
@@ -528,7 +529,7 @@ export function ReferenceTable() {
                     className="hover:bg-gray-50 cursor-pointer"
                     onClick={() => handleTableClick(table.id)}
                   >
-                    <td className="px-6 py-4 text-sm font-medium text-foreground">{table.name}</td>
+                    <td className="px-6 py-4 text-sm font-medium text-foreground"><SensitiveText>{table.name}</SensitiveText></td>
                     <td className="px-6 py-4 text-sm text-foreground">{table.columns}</td>
                     <td className="px-6 py-4 text-sm text-foreground">{table.rows}</td>
                     <td className="px-6 py-4">
@@ -579,10 +580,10 @@ export function ReferenceTable() {
         <div className="flex justify-between items-center">
           <div>
             <div className="text-sm text-muted-foreground mb-1">
-              Reference &gt; {selectedTableData?.name}
+              Reference &gt; <SensitiveText>{selectedTableData?.name}</SensitiveText>
             </div>
             <h1 className="text-2xl font-semibold text-foreground">
-              {selectedTableData?.name}
+              <SensitiveText>{selectedTableData?.name}</SensitiveText>
             </h1>
           </div>
 
@@ -1071,7 +1072,7 @@ export function ReferenceTable() {
                           <div className="w-8 h-8 bg-[#5BBD72] rounded-full flex items-center justify-center text-white text-xs font-semibold">
                             YL
                           </div>
-                          <span className="text-sm text-muted-foreground">{release.author}</span>
+                          <span className="text-sm text-muted-foreground"><SensitiveText>{release.author}</SensitiveText></span>
                         </div>
                       </div>
                       <p className="text-sm text-foreground">{release.changes}</p>

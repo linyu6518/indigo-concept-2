@@ -1,4 +1,5 @@
 import { Card } from "./ui/card";
+import { SensitiveText } from "./SensitiveText";
 import { Badge } from "./ui/badge";
 import { Input } from "./ui/input";
 import { 
@@ -117,7 +118,9 @@ export function DocumentDashboard() {
         {/* Header with Search */}
         <div className="flex items-start justify-between gap-6">
           <div>
-            <h1 className="text-2xl font-semibold text-foreground">Hi Yu, welcome to Indigo Document Store</h1>
+            <h1 className="text-2xl font-semibold text-foreground">
+              Hi <SensitiveText>Yu</SensitiveText>, welcome to Indigo Document Store
+            </h1>
             <p className="text-muted-foreground mt-1">
               Overview of your governance and data quality metrics
             </p>
@@ -579,7 +582,7 @@ export function DocumentDashboard() {
                 {modifiedFields.map((field, index) => (
                   <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-foreground truncate">{field.field}</p>
+                      <p className="text-sm font-medium text-foreground truncate"><SensitiveText>{field.field}</SensitiveText></p>
                     </div>
                     <Badge variant="outline" className="border-blue-200 text-blue-700 bg-blue-50 ml-2">
                       {field.changes}
@@ -602,7 +605,7 @@ export function DocumentDashboard() {
                 {impactedReferences.map((ref, index) => (
                   <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-foreground truncate">{ref.reference}</p>
+                      <p className="text-sm font-medium text-foreground truncate"><SensitiveText>{ref.reference}</SensitiveText></p>
                     </div>
                     <Badge variant="outline" className="border-purple-200 text-purple-700 bg-purple-50 ml-2">
                       {ref.impact}
@@ -663,7 +666,7 @@ export function DocumentDashboard() {
                       23
                     </Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground">CollateralValueDate field</p>
+                  <p className="text-xs text-muted-foreground"><SensitiveText>CollateralValueDate field</SensitiveText></p>
                 </div>
                 <div className="p-3 bg-orange-50 rounded-lg border border-orange-100">
                   <div className="flex items-start justify-between mb-1">
@@ -672,7 +675,7 @@ export function DocumentDashboard() {
                       18
                     </Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground">InterestRateType field</p>
+                  <p className="text-xs text-muted-foreground"><SensitiveText>InterestRateType field</SensitiveText></p>
                 </div>
                 <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-100">
                   <div className="flex items-start justify-between mb-1">
@@ -681,7 +684,7 @@ export function DocumentDashboard() {
                       12
                     </Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground">LoanMaturityDate field</p>
+                  <p className="text-xs text-muted-foreground"><SensitiveText>LoanMaturityDate field</SensitiveText></p>
                 </div>
               </div>
             </Card>
@@ -759,14 +762,14 @@ export function DocumentDashboard() {
                     {/* Content */}
                     <div className="flex-1 pb-6">
                       <div className="flex items-start justify-between mb-1">
-                        <h4 className="font-semibold text-foreground">{activity.title}</h4>
+                        <h4 className="font-semibold text-foreground"><SensitiveText>{activity.title}</SensitiveText></h4>
                         {activity.severity === "high" && (
                           <Badge variant="outline" className="border-red-200 text-red-700 bg-red-50 text-xs">
                             High Priority
                           </Badge>
                         )}
                       </div>
-                      <p className="text-sm text-muted-foreground mb-2">{activity.description}</p>
+                      <p className="text-sm text-muted-foreground mb-2"><SensitiveText>{activity.description}</SensitiveText></p>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <Clock className="w-3 h-3" />
                         <span>{activity.time}</span>

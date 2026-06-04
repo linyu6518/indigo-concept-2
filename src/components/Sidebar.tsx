@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { cn } from "./ui/utils";
+import logoPlaceholder from "../assets/logo-placeholder.svg";
+import { SensitiveText, sensitiveAvatarBlurClass } from "./SensitiveText";
 import { 
   LayoutDashboard,
   Table,
@@ -226,28 +228,18 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        {/* Header with Logo */}
+        {/* Header with placeholder logo */}
         <div className={cn(
           "p-4 flex flex-row items-center justify-start relative",
           isExpanded && "gap-3"
         )}>
-          <div className="w-12 h-12 flex-shrink-0 rounded-lg flex items-center justify-center shadow-lg overflow-hidden">
-            <svg width="100%" height="100%" viewBox="0 0 400 358" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <g clipPath="url(#clip0_13001_2)">
-                <path d="M0 357.728H400V-1.33514e-05H0V357.728Z" fill="#54B948"/>
-                <mask id="mask0_13001_2" style={{ maskType: "luminance" }} maskUnits="userSpaceOnUse" x="0" y="0" width="400" height="358">
-                  <path d="M0 357.728H400V-1.33514e-05H0V357.728Z" fill="white"/>
-                </mask>
-                <g mask="url(#mask0_13001_2)">
-                  <path d="M262.603 280.342H169.435V112.502H216.231V250.611H261.238C292.308 250.611 305.358 229.088 305.358 173.66C305.358 117.901 290.532 101.697 258.993 101.697H156.345V280.342H110.005V101.697H42.0039V71.8994H273.428C329.247 71.8994 355.765 100.783 355.765 173.216C355.765 268.643 316.17 280.342 262.603 280.342Z" fill="white"/>
-                </g>
-              </g>
-              <defs>
-                <clipPath id="clip0_13001_2">
-                  <rect width="400" height="357.728" fill="white"/>
-                </clipPath>
-              </defs>
-            </svg>
+          <div className="w-12 h-12 flex-shrink-0 rounded-lg flex items-center justify-center shadow-lg overflow-hidden bg-white/10 border border-sidebar-border/30">
+            <img
+              src={logoPlaceholder}
+              alt=""
+              className="w-full h-full object-cover"
+              draggable={false}
+            />
           </div>
           {isExpanded && (
             <div className="flex flex-col items-start min-w-0">
@@ -375,13 +367,13 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
               className="w-12 h-12 bg-gradient-to-br from-sidebar-primary to-sidebar-primary/80 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-all duration-300 cursor-pointer"
               onClick={() => setIsExpanded(!isExpanded)}
             >
-              <span className="text-sidebar-primary-foreground font-semibold text-lg">YL</span>
+              <span className={`text-sidebar-primary-foreground font-semibold text-lg ${sensitiveAvatarBlurClass}`}>YL</span>
             </div>
             
             {/* Profile tooltip for collapsed state */}
             {!isExpanded && (
               <div className="absolute left-full ml-4 px-3 py-2 bg-gradient-to-br from-sidebar-primary to-sidebar-primary/90 text-sidebar-primary-foreground rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-50 shadow-lg transform translate-x-2 group-hover:translate-x-0">
-                <div className="font-medium text-sm">Yu</div>
+                <div className="font-medium text-sm"><SensitiveText>Yu</SensitiveText></div>
                 <div className="text-xs opacity-75 mt-1">Admin</div>
                 {/* Tooltip arrow */}
                 <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-2 h-2 bg-sidebar-primary rotate-45" />
@@ -392,7 +384,7 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
             {isExpanded && (
               <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 text-center">
                 <div className="text-sidebar-foreground font-medium text-sm whitespace-nowrap">
-                  Yu
+                  <SensitiveText>Yu</SensitiveText>
                 </div>
                 <div className="text-sidebar-foreground/70 text-xs whitespace-nowrap">
                   Admin
