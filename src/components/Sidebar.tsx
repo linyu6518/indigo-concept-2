@@ -237,17 +237,17 @@ export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
             <img
               src={logoPlaceholder}
               alt=""
-              className="w-full h-full object-cover"
+              className={`w-full h-full object-cover ${sensitiveAvatarBlurClass}`}
               draggable={false}
             />
           </div>
           {isExpanded && (
             <div className="flex flex-col items-start min-w-0">
               <h2 className="text-sidebar-foreground font-semibold text-base whitespace-nowrap">
-                TBSM Indigo
+                <SensitiveText>Document Store</SensitiveText>
               </h2>
               <p className="text-sidebar-foreground/70 text-xs whitespace-nowrap mt-0.5">
-                Document Management
+                <SensitiveText>Governance Platform</SensitiveText>
               </p>
             </div>
           )}

@@ -119,7 +119,7 @@ export function DocumentDashboard() {
         <div className="flex items-start justify-between gap-6">
           <div>
             <h1 className="text-2xl font-semibold text-foreground">
-              Hi <SensitiveText>Yu</SensitiveText>, welcome to Indigo Document Store
+              Hi <SensitiveText>Yu</SensitiveText>, welcome to <SensitiveText>Document Store</SensitiveText>
             </h1>
             <p className="text-muted-foreground mt-1">
               Overview of your governance and data quality metrics
