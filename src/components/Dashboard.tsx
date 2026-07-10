@@ -265,7 +265,7 @@ export function Dashboard() {
                   <PolarGrid stroke="#e5e7eb" />
                   <PolarAngleAxis dataKey="category" tick={{ fill: '#666', fontSize: 10 }} />
                   <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: '#666', fontSize: 10 }} />
-                  <Radar name="Impact" dataKey="value" stroke="#54B948" fill="#54B948" fillOpacity={0.5} />
+                  <Radar name="Impact" dataKey="value" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.5} />
                   <Tooltip 
                     contentStyle={{ 
                       backgroundColor: 'white', 
@@ -418,7 +418,7 @@ export function Dashboard() {
                     }} 
                     formatter={(value) => [`${value}%`, 'Pass Rate']}
                   />
-                  <Line type="monotone" dataKey="passRate" stroke="#54B948" strokeWidth={2} dot={{ fill: '#54B948', r: 4 }} />
+                  <Line type="monotone" dataKey="passRate" stroke="#3B82F6" strokeWidth={2} dot={{ fill: '#3B82F6', r: 4 }} />
                 </LineChart>
               </ResponsiveContainer>
             </Card>

@@ -278,7 +278,7 @@ export function DocumentDashboard() {
                         return item ? item.full : label;
                       }}
                     />
-                    <Bar dataKey="approved" fill="#5BBD72" radius={[4, 4, 0, 0]} name="Approved" maxBarSize={30} />
+                    <Bar dataKey="approved" fill="#3B82F6" radius={[4, 4, 0, 0]} name="Approved" maxBarSize={30} />
                     <Bar dataKey="pending"  fill="#f59e0b" radius={[4, 4, 0, 0]} name="Pending"  maxBarSize={30} />
                     <Bar dataKey="rejected" fill="#f87171" radius={[4, 4, 0, 0]} name="Rejected" maxBarSize={30} />
                   </BarChart>
@@ -357,7 +357,7 @@ export function DocumentDashboard() {
                     }} 
                     formatter={(value) => [`${value}%`, 'Failure Rate']}
                   />
-                  <Line type="monotone" dataKey="rate" stroke="#5BBD72" strokeWidth={2} dot={{ fill: '#5BBD72', r: 4 }} />
+                  <Line type="monotone" dataKey="rate" stroke="#3B82F6" strokeWidth={2} dot={{ fill: '#3B82F6', r: 4 }} />
                 </LineChart>
               </ResponsiveContainer>
 
@@ -559,7 +559,7 @@ export function DocumentDashboard() {
                   <PolarGrid stroke="#e5e7eb" />
                   <PolarAngleAxis dataKey="category" tick={{ fill: '#666', fontSize: 10 }} />
                   <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: '#666', fontSize: 10 }} />
-                  <Radar name="Impact" dataKey="value" stroke="#5BBD72" fill="#5BBD72" fillOpacity={0.5} />
+                  <Radar name="Impact" dataKey="value" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.5} />
                   <Tooltip 
                     contentStyle={{ 
                       backgroundColor: 'white', 
@@ -712,7 +712,7 @@ export function DocumentDashboard() {
                     }} 
                     formatter={(value) => [`${value}%`, 'Pass Rate']}
                   />
-                  <Line type="monotone" dataKey="passRate" stroke="#5BBD72" strokeWidth={2} dot={{ fill: '#5BBD72', r: 4 }} />
+                  <Line type="monotone" dataKey="passRate" stroke="#3B82F6" strokeWidth={2} dot={{ fill: '#3B82F6', r: 4 }} />
                 </LineChart>
               </ResponsiveContainer>
             </Card>

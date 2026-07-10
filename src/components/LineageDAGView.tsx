@@ -60,10 +60,10 @@ export function LineageDAGView({ lineage }: LineageDAGViewProps) {
         };
       case "catalog":
         return {
-          bg: "bg-[#5BBD72]/10",
-          border: "border-[#5BBD72]",
-          icon: "bg-[#5BBD72]",
-          text: "text-[#5BBD72]"
+          bg: "bg-primary/10",
+          border: "border-primary",
+          icon: "bg-primary",
+          text: "text-primary"
         };
       case "dq":
         return {
@@ -200,7 +200,7 @@ export function LineageDAGView({ lineage }: LineageDAGViewProps) {
             <span className="text-xs text-foreground">Transform</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-[#5BBD72]"></div>
+            <div className="w-3 h-3 rounded bg-primary"></div>
             <span className="text-xs text-foreground">Catalog</span>
           </div>
           <div className="flex items-center gap-2">

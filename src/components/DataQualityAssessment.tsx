@@ -401,7 +401,7 @@ export function DataQualityAssessment() {
             <button
               key={ruleGroup.id}
               onClick={() => handleRuleGroupClick(ruleGroup.id)}
-              className="bg-white border border-gray-200 rounded-lg p-5 text-left hover:border-[#5BBD72] hover:shadow-md transition-all"
+              className="bg-white border border-gray-200 rounded-lg p-5 text-left hover:border-primary hover:shadow-md transition-all"
             >
               <div className="flex items-start justify-between mb-4">
                 <h3 className="font-semibold text-foreground pr-2"><SensitiveText>{ruleGroup.name}</SensitiveText></h3>
@@ -432,7 +432,7 @@ export function DataQualityAssessment() {
               </div>
 
               <div className="pt-3 border-t border-gray-100">
-                <div className="flex items-center justify-between text-sm text-[#5BBD72]">
+                <div className="flex items-center justify-between text-sm text-primary">
                   <span>View Quality Flow</span>
                   <ArrowRight className="w-4 h-4" />
                 </div>
@@ -474,7 +474,7 @@ export function DataQualityAssessment() {
             onClick={() => setActiveTab("rules")}
             className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${
               activeTab === "rules"
-                ? "border-[#5BBD72] text-[#5BBD72]"
+                ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -484,7 +484,7 @@ export function DataQualityAssessment() {
             onClick={() => setActiveTab("metrics")}
             className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${
               activeTab === "metrics"
-                ? "border-[#5BBD72] text-[#5BBD72]"
+                ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -494,7 +494,7 @@ export function DataQualityAssessment() {
             onClick={() => setActiveTab("fields")}
             className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${
               activeTab === "fields"
-                ? "border-[#5BBD72] text-[#5BBD72]"
+                ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -511,7 +511,7 @@ export function DataQualityAssessment() {
             {/* Quality Flow Visualization */}
             <div className="bg-white border border-gray-200 rounded-lg p-6">
               <h3 className="font-semibold text-foreground mb-6 flex items-center gap-2">
-                <Activity className="w-5 h-5 text-[#5BBD72]" />
+                <Activity className="w-5 h-5 text-primary" />
                 Quality Flow Process
               </h3>
               
@@ -531,7 +531,7 @@ export function DataQualityAssessment() {
                       <div className="font-semibold text-sm text-foreground mb-1">{flow.stage}</div>
                       <div className="text-xs text-muted-foreground mb-1"><SensitiveText>{flow.description}</SensitiveText></div>
                       {flow.rules > 0 && (
-                        <div className="text-xs font-medium text-[#5BBD72]">{flow.rules} rules</div>
+                        <div className="text-xs font-medium text-primary">{flow.rules} rules</div>
                       )}
                     </div>
                     
@@ -546,13 +546,13 @@ export function DataQualityAssessment() {
             {/* Rules with Health Information */}
             <div>
               <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                <FileWarning className="w-5 h-5 text-[#5BBD72]" />
+                <FileWarning className="w-5 h-5 text-primary" />
                 Rules Health Status
               </h3>
               
               <div className="space-y-4">
                 {mockDQRules.map((rule) => (
-                  <div key={rule.id} className="bg-white border border-gray-200 rounded-lg p-5 hover:border-[#5BBD72] transition-colors">
+                  <div key={rule.id} className="bg-white border border-gray-200 rounded-lg p-5 hover:border-primary transition-colors">
                     <div className="flex items-start justify-between mb-4">
                       <div>
                         <h4 className="font-semibold text-foreground mb-1"><SensitiveText>{rule.name}</SensitiveText></h4>
@@ -601,7 +601,7 @@ export function DataQualityAssessment() {
                         <Clock className="w-4 h-4" />
                         Last failure: {rule.lastFailure}
                       </div>
-                      <Button variant="outline" size="sm" className="text-[#5BBD72] border-[#5BBD72]">
+                      <Button variant="outline" size="sm" className="text-primary border-primary">
                         View Details
                       </Button>
                     </div>
@@ -708,7 +708,7 @@ export function DataQualityAssessment() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {mockFieldHealth.map((field, idx) => (
-                <div key={idx} className="bg-white border border-gray-200 rounded-lg p-5 hover:border-[#5BBD72] transition-all">
+                <div key={idx} className="bg-white border border-gray-200 rounded-lg p-5 hover:border-primary transition-all">
                   <div className="flex items-start justify-between mb-4">
                     <h4 className="font-semibold text-foreground pr-2"><SensitiveText>{field.fieldName}</SensitiveText></h4>
                     {getTrendIcon(field.trend)}
@@ -741,7 +741,7 @@ export function DataQualityAssessment() {
                   </div>
 
                   <div className="mt-4 pt-4 border-t border-gray-100">
-                    <Button variant="outline" size="sm" className="w-full text-[#5BBD72] border-[#5BBD72]">
+                    <Button variant="outline" size="sm" className="w-full text-primary border-primary">
                       View Field History
                     </Button>
                   </div>

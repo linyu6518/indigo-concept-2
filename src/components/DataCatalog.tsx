@@ -1043,7 +1043,7 @@ export function DataCatalog() {
                 <Share2 className="w-4 h-4" />
                 Share Lineage
               </Button>
-              <Button variant="default" className="gap-2 bg-[#5BBD72] hover:bg-[#4da862]">
+              <Button variant="default" className="gap-2 bg-primary hover:bg-primary/90">
                 <Eye className="w-4 h-4" />
                 View Full Graph
               </Button>

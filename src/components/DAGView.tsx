@@ -187,7 +187,7 @@ export function DAGView({ nodes, onNodeClick, onEditNode }: DAGViewProps) {
       <div
         className="absolute inset-0 pointer-events-none opacity-30 rounded-lg"
         style={{
-          backgroundImage: 'radial-gradient(circle, #5BBD72 1px, transparent 1px)',
+          backgroundImage: 'radial-gradient(circle, #3B82F6 1px, transparent 1px)',
           backgroundSize: '30px 30px',
         }}
       />
@@ -251,7 +251,7 @@ export function DAGView({ nodes, onNodeClick, onEditNode }: DAGViewProps) {
             refY="3"
             orient="auto"
           >
-            <polygon points="0 0, 10 3, 0 6" fill="#5BBD72" />
+            <polygon points="0 0, 10 3, 0 6" fill="#3B82F6" />
           </marker>
         </defs>
         
@@ -290,7 +290,7 @@ export function DAGView({ nodes, onNodeClick, onEditNode }: DAGViewProps) {
               {/* Main path */}
               <path
                 d={path}
-                stroke={isHighRisk ? "#f59e0b" : "#5BBD72"}
+                stroke={isHighRisk ? "#f59e0b" : "#3B82F6"}
                 strokeWidth="3"
                 fill="none"
                 markerEnd="url(#arrowhead)"
@@ -371,8 +371,8 @@ export function DAGView({ nodes, onNodeClick, onEditNode }: DAGViewProps) {
                   </div>
                   
                   {/* Sequence Badge - Right Top Corner */}
-                  <div className="flex-shrink-0 px-2.5 py-1 bg-[#5BBD72]/10 rounded-md">
-                    <span className="text-[#5BBD72] font-bold text-sm">#{rg.sequence}</span>
+                  <div className="flex-shrink-0 px-2.5 py-1 bg-primary/10 rounded-md">
+                    <span className="text-primary font-bold text-sm">#{rg.sequence}</span>
                   </div>
                 </div>
 

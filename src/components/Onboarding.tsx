@@ -835,7 +835,7 @@ export function Onboarding() {
     return (
       <Card
         key={feedData.feed}
-        className="p-5 bg-white border border-gray-200 hover:border-[#5BBD72] hover:shadow-md transition-all cursor-pointer"
+        className="p-5 bg-white border border-gray-200 hover:border-primary hover:shadow-md transition-all cursor-pointer"
         onClick={() => handleFeedClick(feedData.feed)}
       >
         {/* Header with Title and Status */}
@@ -1161,11 +1161,11 @@ export function Onboarding() {
                                   height: 36,
                                   minWidth: 36,
                                   minHeight: 36,
-                                  borderColor: feed.healthScore >= 80 ? '#5BBD72' : feed.healthScore >= 60 ? '#f59e0b' : '#ef4444'
+                                  borderColor: feed.healthScore >= 80 ? '#3B82F6' : feed.healthScore >= 60 ? '#f59e0b' : '#ef4444'
                                 }}
                               >
                                 <span className="text-xs font-bold leading-none" style={{
-                                  color: feed.healthScore >= 80 ? '#5BBD72' : feed.healthScore >= 60 ? '#f59e0b' : '#ef4444'
+                                  color: feed.healthScore >= 80 ? '#3B82F6' : feed.healthScore >= 60 ? '#f59e0b' : '#ef4444'
                                 }}>
                                   {feed.healthScore}
                                 </span>
@@ -1307,7 +1307,7 @@ export function Onboarding() {
           {/* Action Buttons Row */}
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <Button size="sm" className="gap-2 bg-[#5BBD72] hover:bg-[#4da862] text-white">
+              <Button size="sm" className="gap-2 bg-primary hover:bg-primary/90 text-white">
                 <Plus className="w-4 h-4" />
                 Add RuleGroup
               </Button>
@@ -1440,7 +1440,7 @@ export function Onboarding() {
                         <td className="px-4 py-4 text-sm text-foreground"><SensitiveText>{rg.outputViewName || "-"}</SensitiveText></td>
                         <td className="px-4 py-4">
                           <div className="flex items-center gap-2">
-                            <button className="text-muted-foreground hover:text-[#5BBD72] transition-colors">
+                            <button className="text-muted-foreground hover:text-primary transition-colors">
                               <Bookmark className="w-4 h-4" />
                             </button>
                             <button
@@ -1546,7 +1546,7 @@ export function Onboarding() {
                 }}>
                   Reset
                 </Button>
-                <Button onClick={handleSaveRuleGroupEdit} className="bg-[#5BBD72] hover:bg-[#4da862] text-white">
+                <Button onClick={handleSaveRuleGroupEdit} className="bg-primary hover:bg-primary/90 text-white">
                   Submit
                 </Button>
               </div>
@@ -1612,7 +1612,7 @@ export function Onboarding() {
             <Button 
               onClick={() => setShowAddRowDialog(true)} 
               size="sm" 
-              className="gap-2 bg-[#5BBD72] hover:bg-[#4da862] text-white"
+              className="gap-2 bg-primary hover:bg-primary/90 text-white"
             >
               <Plus className="w-4 h-4" />
               Add Row
@@ -1622,7 +1622,7 @@ export function Onboarding() {
               onClick={() => setTestModeEnabled(!testModeEnabled)}
               className={`px-4 py-2 text-sm rounded-md font-medium transition-all ${
                 testModeEnabled 
-                  ? 'bg-[#5BBD72] text-white shadow-md' 
+                  ? 'bg-primary text-white shadow-md' 
                   : 'bg-gray-100 text-muted-foreground hover:bg-gray-200'
               }`}
             >
@@ -1688,7 +1688,7 @@ export function Onboarding() {
                   className="bg-white"
                 />
               </div>
-              <Button onClick={handleApplyFilter} size="sm" className="bg-[#5BBD72] hover:bg-[#4da862] text-white">
+              <Button onClick={handleApplyFilter} size="sm" className="bg-primary hover:bg-primary/90 text-white">
                 Apply
               </Button>
               <Button onClick={() => {
@@ -1999,7 +1999,7 @@ export function Onboarding() {
                   <button
                     type="button"
                     onClick={() => setSqlValidation(validateSQL(editingRuleData.value))}
-                    className="px-3 py-1.5 text-xs rounded-md bg-[#5BBD72] text-white hover:bg-[#4da862] transition-colors"
+                    className="px-3 py-1.5 text-xs rounded-md bg-primary text-white hover:bg-primary/90 transition-colors"
                   >
                     Validate Query
                   </button>
@@ -2268,7 +2268,7 @@ export function Onboarding() {
                 }}>
                   Reset
                 </Button>
-                <Button onClick={handleSaveEdit} className="bg-[#5BBD72] hover:bg-[#4da862] text-white">
+                <Button onClick={handleSaveEdit} className="bg-primary hover:bg-primary/90 text-white">
                   Submit
                 </Button>
               </div>
@@ -2339,7 +2339,7 @@ export function Onboarding() {
               <Button variant="outline">
                 Reset
               </Button>
-              <Button onClick={handleAddRow} className="bg-[#5BBD72] hover:bg-[#4da862] text-white">
+              <Button onClick={handleAddRow} className="bg-primary hover:bg-primary/90 text-white">
                 Submit
               </Button>
             </div>
@@ -2467,7 +2467,7 @@ export function Onboarding() {
                     {/* Target */}
                     <div className="flex-1">
                       <div className="text-xs text-muted-foreground mb-1">Target Field</div>
-                      <Badge className="bg-[#5BBD72] text-white">
+                      <Badge className="bg-primary text-white">
                         <SensitiveText>{selectedRuleForLineage.attributeName || field}</SensitiveText>
                       </Badge>
                     </div>

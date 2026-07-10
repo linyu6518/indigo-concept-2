@@ -373,7 +373,7 @@ export function ReferenceTable() {
               <button
                 key={table.id}
                 onClick={() => handleTableClick(table.id)}
-                className="flex-shrink-0 min-w-[200px] bg-white border border-gray-200 rounded-lg p-5 text-left hover:border-[#5BBD72] hover:shadow-md transition-all"
+                className="flex-shrink-0 min-w-[200px] bg-white border border-gray-200 rounded-lg p-5 text-left hover:border-primary hover:shadow-md transition-all"
                 style={{ width: "calc((100cqw - 3 * 1rem) / 3.5)" }}
               >
                 <div className="flex items-start justify-between mb-3">
@@ -442,7 +442,7 @@ export function ReferenceTable() {
               <button
                 key={table.id}
                 onClick={() => handleTableClick(table.id)}
-                className="bg-white border border-gray-200 rounded-lg p-5 text-left hover:border-[#5BBD72] hover:shadow-md transition-all"
+                className="bg-white border border-gray-200 rounded-lg p-5 text-left hover:border-primary hover:shadow-md transition-all"
               >
                 <div className="flex items-start justify-between mb-3">
                   <h3 className="font-semibold text-foreground"><SensitiveText>{table.name}</SensitiveText></h3>
@@ -605,7 +605,7 @@ export function ReferenceTable() {
             onClick={() => setActiveTab("data")}
             className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${
               activeTab === "data"
-                ? "border-[#5BBD72] text-[#5BBD72]"
+                ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -620,7 +620,7 @@ export function ReferenceTable() {
             onClick={() => setActiveTab("usage")}
             className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${
               activeTab === "usage"
-                ? "border-[#5BBD72] text-[#5BBD72]"
+                ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -630,7 +630,7 @@ export function ReferenceTable() {
             onClick={() => setActiveTab("impact")}
             className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${
               activeTab === "impact"
-                ? "border-[#5BBD72] text-[#5BBD72]"
+                ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -640,7 +640,7 @@ export function ReferenceTable() {
             onClick={() => setActiveTab("history")}
             className={`pb-3 px-1 text-sm font-medium border-b-2 transition-colors ${
               activeTab === "history"
-                ? "border-[#5BBD72] text-[#5BBD72]"
+                ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -716,7 +716,7 @@ export function ReferenceTable() {
               </div>
               <Button
                 onClick={handleAddNew}
-                className="gap-2 bg-[#5BBD72] hover:bg-[#4AA962] text-white"
+                className="gap-2 bg-primary hover:bg-primary/90 text-white"
                 size="sm"
               >
                 <Plus className="w-4 h-4" />
@@ -777,7 +777,7 @@ export function ReferenceTable() {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => handleEditRow(row)}
-                              className="text-muted-foreground hover:text-[#5BBD72] transition-colors"
+                              className="text-muted-foreground hover:text-primary transition-colors"
                               title="Edit"
                             >
                               <Edit className="w-4 h-4" />
@@ -920,7 +920,7 @@ export function ReferenceTable() {
                 </div>
                 <div className="pl-4 border-l-2 border-gray-200 space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-[#5BBD72] rounded-full"></div>
+                    <div className="w-2 h-2 bg-primary rounded-full"></div>
                     <div className="text-sm font-medium text-foreground">BandingMapReferenceData</div>
                   </div>
                   <div className="flex items-center gap-3 ml-4">
@@ -1058,7 +1058,7 @@ export function ReferenceTable() {
               <div className="space-y-6">
                 {mockReleaseHistory.map((release, idx) => (
                   <div key={idx} className="relative pl-14">
-                    <div className="absolute left-0 w-12 h-12 bg-[#5BBD72] rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-lg">
+                    <div className="absolute left-0 w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-lg">
                       {release.version.replace('v', '')}
                     </div>
                     
@@ -1069,7 +1069,7 @@ export function ReferenceTable() {
                           <p className="text-sm text-muted-foreground">{release.date}</p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 bg-[#5BBD72] rounded-full flex items-center justify-center text-white text-xs font-semibold">
+                          <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-xs font-semibold">
                             YL
                           </div>
                           <span className="text-sm text-muted-foreground"><SensitiveText>{release.author}</SensitiveText></span>
@@ -1077,11 +1077,11 @@ export function ReferenceTable() {
                       </div>
                       <p className="text-sm text-foreground">{release.changes}</p>
                       <div className="mt-3 flex gap-2">
-                        <button className="text-xs text-[#5BBD72] hover:underline">View Details</button>
+                        <button className="text-xs text-primary hover:underline">View Details</button>
                         <span className="text-xs text-muted-foreground">•</span>
-                        <button className="text-xs text-[#5BBD72] hover:underline">Compare</button>
+                        <button className="text-xs text-primary hover:underline">Compare</button>
                         <span className="text-xs text-muted-foreground">•</span>
-                        <button className="text-xs text-[#5BBD72] hover:underline">Rollback</button>
+                        <button className="text-xs text-primary hover:underline">Rollback</button>
                       </div>
                     </div>
                   </div>
@@ -1262,7 +1262,7 @@ export function ReferenceTable() {
               </Button>
               <Button
                 onClick={handleSubmitEdit}
-                className="bg-[#5BBD72] hover:bg-[#4AA962] text-white"
+                className="bg-primary hover:bg-primary/90 text-white"
               >
                 Submit
               </Button>

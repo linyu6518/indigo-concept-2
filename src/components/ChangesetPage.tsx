@@ -458,7 +458,7 @@ export function ChangesetPage() {
               placeholder="Search Jira Ticket..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBD72] focus:border-transparent text-sm"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
             />
           </div>
         </div>
@@ -552,7 +552,7 @@ export function ChangesetPage() {
             <div className="flex items-center gap-2">
               <button 
                 onClick={handleBatchApprove}
-                className="flex items-center gap-2 px-4 py-2 text-sm text-white bg-[#5BBD72] rounded-lg hover:bg-[#4a9d5f] transition-colors"
+                className="flex items-center gap-2 px-4 py-2 text-sm text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors"
               >
                 <CheckCircle2 className="w-4 h-4" />
                 Approve Selected ({selectedItems.size})
@@ -591,7 +591,7 @@ export function ChangesetPage() {
                         type="checkbox"
                         checked={isAllSelected}
                         onChange={(e) => handleSelectAll(e.target.checked)}
-                        className="w-4 h-4 rounded border-gray-300 text-[#5BBD72] focus:ring-[#5BBD72]"
+                        className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                         title="Only non-high-risk items can be batch selected"
                       />
                     </th>
@@ -654,7 +654,7 @@ export function ChangesetPage() {
                             onChange={() => handleSelectItem(item.id)}
                             disabled={item.riskLevel === "high"}
                             className={cn(
-                              "w-4 h-4 rounded border-gray-300 text-[#5BBD72] focus:ring-[#5BBD72]",
+                              "w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary",
                               item.riskLevel === "high" && "opacity-50 cursor-not-allowed"
                             )}
                             title={item.riskLevel === "high" ? "High risk items cannot be batch selected" : ""}
@@ -685,7 +685,7 @@ export function ChangesetPage() {
                         <td className="px-4 py-4">
                           <div className="flex items-center gap-2">
                             <span className="text-sm text-gray-900 font-medium"><SensitiveText>{item.jiraTicket}</SensitiveText></span>
-                            <ExternalLink className="w-3.5 h-3.5 text-gray-400 hover:text-[#5BBD72] cursor-pointer transition-colors" />
+                            <ExternalLink className="w-3.5 h-3.5 text-gray-400 hover:text-primary cursor-pointer transition-colors" />
                           </div>
                         </td>
                         <td className="px-4 py-4 text-sm text-gray-700">{item.category}</td>
@@ -696,9 +696,9 @@ export function ChangesetPage() {
                             onClick={() => setShowCommentTooltip(showCommentTooltip === item.id ? null : item.id)}
                             className="p-1.5 rounded hover:bg-gray-100 transition-colors relative group"
                           >
-                            <MessageSquare className="w-4 h-4 text-gray-400 group-hover:text-[#5BBD72]" />
+                            <MessageSquare className="w-4 h-4 text-gray-400 group-hover:text-primary" />
                             {item.comments > 0 && (
-                              <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#5BBD72] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                              <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                                 {item.comments}
                               </span>
                             )}
@@ -754,7 +754,7 @@ export function ChangesetPage() {
                             }}
                             className="flex items-center justify-center w-8 h-8 rounded hover:bg-gray-100 transition-colors"
                           >
-                            <Edit2 className="w-4 h-4 text-gray-400 hover:text-[#5BBD72]" />
+                            <Edit2 className="w-4 h-4 text-gray-400 hover:text-primary" />
                           </button>
                         </td>
                       </tr>
@@ -769,7 +769,7 @@ export function ChangesetPage() {
                                 {/* Change Summary */}
                                 <div className="bg-white border border-gray-200 rounded-lg p-4">
                                   <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                                    <GitBranch className="w-4 h-4 text-[#5BBD72]" />
+                                    <GitBranch className="w-4 h-4 text-primary" />
                                     Change Summary
                                   </h4>
                                   <div className="grid grid-cols-2 gap-4">
@@ -821,7 +821,7 @@ export function ChangesetPage() {
                                 {/* Impact Summary */}
                                 <div className="bg-white border border-gray-200 rounded-lg p-4">
                                   <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                                    <TrendingUp className="w-4 h-4 text-[#5BBD72]" />
+                                    <TrendingUp className="w-4 h-4 text-primary" />
                                     Impact Summary
                                   </h4>
                                   <div className="grid grid-cols-4 gap-4">
@@ -854,12 +854,12 @@ export function ChangesetPage() {
                                   <div className="bg-white border border-gray-200 rounded-lg p-4">
                                     <div className="flex items-center justify-between mb-3">
                                       <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                                        <Eye className="w-4 h-4 text-[#5BBD72]" />
+                                        <Eye className="w-4 h-4 text-primary" />
                                         SQL Diff
                                       </h4>
                                       <button
                                         onClick={() => setShowSqlDiff(showSqlDiff === item.id ? null : item.id)}
-                                        className="text-xs text-[#5BBD72] hover:text-[#4a9d5f] font-medium"
+                                        className="text-xs text-primary hover:text-[#2563EB] font-medium"
                                       >
                                         {showSqlDiff === item.id ? "Hide" : "Show"} Diff
                                       </button>
@@ -954,7 +954,7 @@ export function ChangesetPage() {
                 <select
                   value={itemsPerPage}
                   onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                  className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBD72] focus:border-transparent"
+                  className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 >
                   <option value={10}>10</option>
                   <option value={25}>25</option>
@@ -1040,7 +1040,7 @@ export function ChangesetPage() {
                   setShowApprovalConfirm(false);
                   setSelectedItems(new Set());
                 }}
-                className="flex-1 px-4 py-2 text-sm font-medium text-white bg-[#5BBD72] rounded-lg hover:bg-[#4a9d5f] transition-colors"
+                className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors"
               >
                 Confirm Approval
               </button>
@@ -1068,7 +1068,7 @@ export function ChangesetPage() {
             >
               <div className="flex items-center justify-between mb-3">
                 <h5 className="font-semibold text-gray-900 text-sm flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-[#5BBD72]" />
+                  <MessageSquare className="w-4 h-4 text-primary" />
                   Comments ({item.comments})
                 </h5>
                 <button 
@@ -1108,7 +1108,7 @@ export function ChangesetPage() {
               )}
 
               <div className="mt-3 pt-3 border-t border-gray-200">
-                <button className="w-full px-3 py-2 text-xs font-medium text-white bg-[#5BBD72] rounded-lg hover:bg-[#4a9d5f] transition-colors">
+                <button className="w-full px-3 py-2 text-xs font-medium text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors">
                   Add Comment
                 </button>
               </div>
@@ -1151,7 +1151,7 @@ export function ChangesetPage() {
                     type="text"
                     value={editForm.jiraTicket}
                     onChange={(e) => setEditForm({ ...editForm, jiraTicket: e.target.value })}
-                    className={`w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5BBD72] focus:border-transparent text-sm ${sensitiveInputBlurClass}`}
+                    className={`w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm ${sensitiveInputBlurClass}`}
                     placeholder="Enter Jira Ticket"
                   />
                 </div>
@@ -1165,7 +1165,7 @@ export function ChangesetPage() {
                     type="text"
                     value={editForm.releaseVersion}
                     onChange={(e) => setEditForm({ ...editForm, releaseVersion: e.target.value })}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5BBD72] focus:border-transparent text-sm"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
                     placeholder="Enter Release Version"
                   />
                 </div>
@@ -1179,7 +1179,7 @@ export function ChangesetPage() {
                     value={editForm.comments}
                     onChange={(e) => setEditForm({ ...editForm, comments: e.target.value })}
                     rows={4}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5BBD72] focus:border-transparent text-sm resize-none"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm resize-none"
                     placeholder="Enter comments..."
                   />
                 </div>
@@ -1200,7 +1200,7 @@ export function ChangesetPage() {
                     // Save logic here
                     setEditingItem(null);
                   }}
-                  className="px-6 py-2.5 text-sm font-medium text-white bg-[#5BBD72] rounded-lg hover:bg-[#4a9d5f] transition-colors shadow-sm"
+                  className="px-6 py-2.5 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
                 >
                   Save
                 </button>
